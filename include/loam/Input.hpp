@@ -1,49 +1,46 @@
-#ifndef EARTHBORN_KEYBOARD_HPP
-#define EARTHBORN_KEYBOARD_HPP
+#pragma once
 
 #include <SDL3/SDL.h>
+namespace loam {
+    class Input {
+    public:
+        Input();
+        ~Input();
+        void update();
+        void process_event(const SDL_Event* event);
 
-class Input {
-public:
-    Input();
-    ~Input();
-    void update();
-    void processEvent(const SDL_Event* event);
+        [[nodiscard]] bool is_key_down(SDL_Scancode key) const;
+        [[nodiscard]] bool is_key_pressed(SDL_Scancode key) const;
+        [[nodiscard]] bool is_key_released(SDL_Scancode key) const;
+        [[nodiscard]] bool is_keyboard_active() const;
 
-    [[nodiscard]] bool isKeyDown(SDL_Scancode key) const;
-    [[nodiscard]] bool isKeyPressed(SDL_Scancode key) const;
-    [[nodiscard]] bool isKeyReleased(SDL_Scancode key) const;
-    [[nodiscard]] bool isKeyboardActive() const;
+        [[nodiscard]] bool is_mouse_button_down(int button) const;
+        [[nodiscard]] bool is_mouse_button_pressed(int button) const;
+        [[nodiscard]] bool is_mouse_button_released(int button) const;
+        [[nodiscard]] float get_mouse_x() const;
+        [[nodiscard]] float get_mouse_y() const;
+        [[nodiscard]] bool is_mouse_active() const;
 
-    [[nodiscard]] bool isMouseButtonDown(int button) const;
-    [[nodiscard]] bool isMouseButtonPressed(int button) const;
-    [[nodiscard]] bool isMouseButtonReleased(int button) const;
-    [[nodiscard]] float getMouseX() const;
-    [[nodiscard]] float getMouseY() const;
-    [[nodiscard]] bool isMouseActive() const;
+        [[nodiscard]] bool is_gamepad_button_down(SDL_GamepadButton button) const;
+        [[nodiscard]] bool is_gamepad_button_pressed(SDL_GamepadButton button) const;
+        [[nodiscard]] bool is_gamepad_button_released(SDL_GamepadButton button) const;
+        [[nodiscard]] float get_gamepad_axis(SDL_GamepadAxis axis) const;
+        [[nodiscard]] bool is_gamepad_connected() const;
+        [[nodiscard]] bool is_gamepad_active() const;
+    private:
+        float mouse_x;
+        float mouse_y;
+        Uint32 current_mouse_state;
+        Uint32 previous_mouse_state;
+        bool mouse_active;
 
-    [[nodiscard]] bool isGamepadButtonDown(SDL_GamepadButton button) const;
-    [[nodiscard]] bool isGamepadButtonPressed(SDL_GamepadButton button) const;
-    [[nodiscard]] bool isGamepadButtonReleased(SDL_GamepadButton button) const;
-    [[nodiscard]] float getGamepadAxis(SDL_GamepadAxis axis) const;
-    [[nodiscard]] bool isGamepadConnected() const;
-    [[nodiscard]] bool isGamepadActive() const;
-private:
-    float mouseX;
-    float mouseY;
-    Uint32 currentMouseState;
-    Uint32 previousMouseState;
-    bool mouseActive;
+        const bool* current_key_state;
+        bool previous_key_state[SDL_SCANCODE_COUNT];
+        bool keyboard_active;
 
-    const bool* currentKeyState;
-    bool previousKeyState[SDL_SCANCODE_COUNT];
-    bool keyboardActive;
-
-    SDL_Gamepad* gamepad;
-    Uint8 currentGamepadButtons[SDL_GAMEPAD_BUTTON_COUNT];
-    Uint8 previousGamepadButtons[SDL_GAMEPAD_BUTTON_COUNT];
-    bool gamepadActive;
-};
-
-
-#endif //EARTHBORN_KEYBOARD_HPP
+        SDL_Gamepad* gamepad;
+        Uint8 current_gamepad_buttons[SDL_GAMEPAD_BUTTON_COUNT];
+        Uint8 previous_gamepad_buttons[SDL_GAMEPAD_BUTTON_COUNT];
+        bool gamepad_active;
+    };
+} //loam

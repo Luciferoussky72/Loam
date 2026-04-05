@@ -6,7 +6,15 @@ set(CMAKE_CXX_STANDARD 20)
 add_library(Loam STATIC
         src/loam.cpp
         src/Coil.cpp
-        src/Coil.hpp
+        src/Camera.cpp
+        src/Engine.cpp
+        src/Entity.cpp
+        src/Input.cpp
+        src/Loader.cpp
+        src/Random.cpp
+        src/Sprite.cpp
+        src/Timer.cpp
+        src/Player.cpp
 )
 
 

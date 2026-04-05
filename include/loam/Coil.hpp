@@ -150,5 +150,5 @@ namespace loam {
 
         size_t num_rewinds_parent;
     };
-} // loam
+} //loam
 
