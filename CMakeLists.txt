@@ -9,12 +9,13 @@ add_library(Loam STATIC
         src/Camera.cpp
         src/Engine.cpp
         src/Entity.cpp
-        src/Input.cpp
+        src/GamepadInput.cpp
         src/Loader.cpp
         src/Random.cpp
         src/Sprite.cpp
         src/Timer.cpp
         src/Player.cpp
+        src/KeyboardMouseInput.cpp
 )
 
 
