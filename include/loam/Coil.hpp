@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <compare>
+#include <new>
 
 namespace loam {
     template <typename T>
@@ -12,7 +13,7 @@ namespace loam {
      * @note be sure to explicitly call destructors if memory is allocated to store objects!
      * @note
      * Q: Why is it a coil?
-     * A: It's more interesting of a name than "Arena," and gets across how this class differs from a traditional arena
+     * A: It's more interesting of a name than "Arena" and gets across how this class differs from a traditional arena
      */
     class Coil {
     public:
@@ -30,15 +31,43 @@ namespace loam {
         ~Coil();
 
         /**
-         * Allocates memory and returns a raw pointer to it
-         * @param bytes the amount of bytes to allocate
-         * @throws std::bad_alloc if your allocation would overrun the buffer
-         * @param alignment the byte count will be rounded to the next highest multiple of this
-         * @note alignment defaults to 8
-         * @return a pointer to start of the allocated block of memory
-         * @note be sure to explicitly call destructors if memory is allocated to store objects!
+         * Copy constructor deleted because it doesn't make sense to copy a Coil
          */
-        [[nodiscard]] void* alloc(size_t bytes, size_t alignment = 8);
+        Coil(const Coil&) = delete;
+        /**
+         * Copying via the = operator is deleted because it doesn't make sense to copy a Coil
+         */
+        Coil& operator=(const Coil&) = delete;
+        /**
+         * Moving is deleted because it would invalidate any coil_ptr objects from a Coil
+         */
+        Coil(Coil&&) = delete;
+        /**
+         * Move assignment is deleted because it would invalidate any coil_ptr objects from a Coil
+         */
+        Coil& operator=(Coil&&) = delete;
+
+        /**
+         * Allocates memory and returns a typed pointer to it
+         * @param bytes the amount of bytes to allocate
+         * @throws std::bad_alloc if your allocation would overrun the coil's buffer
+         * @param alignment the byte count will be rounded to the next highest multiple of this; defaults to 8
+         * @return a pointer to start of the allocated block of memory
+         */
+        template <typename T>
+        [[nodiscard]] T* alloc(size_t bytes, size_t alignment) {
+            static_assert(std::is_trivially_destructible_v<T>);
+            bytes = (bytes + alignment - 1) & ~(alignment - 1);
+
+            if (current_point + bytes > capacity) {
+                throw std::bad_alloc();
+            }
+
+            T* tmp = static_cast<T*>(data + current_point);
+            current_point += bytes;
+            size_of_last_alloc = bytes;
+            return tmp;
+        }
 
         /**
          * Undoes and **invalidates** the last call to alloc or safe_alloc.
@@ -64,8 +93,9 @@ namespace loam {
          * @note be sure to explicitly call destructors if memory is allocated to store objects!
          */
         template <typename T>
-        coil_ptr<T> safe_alloc(size_t bytes, size_t alignment = 8) {
-            return coil_ptr<T>(this->alloc(bytes, alignment), *this);
+        [[nodiscard]] coil_ptr<T> safe_alloc(size_t bytes, size_t alignment = 8) {
+            static_assert(std::is_trivially_destructible_v<T>);
+            return coil_ptr<T>(this->alloc<T>(bytes, alignment), *this);
         }
 
         /**
@@ -105,7 +135,7 @@ namespace loam {
          * @return the internal raw pointer if the parent coil hasn't been unwound OR rewound, nullptr otherwise
          * @note theoretically, it could be safe if the parent has been rewound, but that's unreliable to implement
          */
-        [[nodiscard]] T* lock() {
+        [[nodiscard]] T* safe_get() {
             if (num_rewinds_parent != parent.get_num_rewinds()) {
                 return nullptr;
             }
@@ -150,5 +180,5 @@ namespace loam {
 
         size_t num_rewinds_parent;
     };
-} //loam
+} // loam
 

@@ -31,4 +31,4 @@ namespace loam {
             SDL_Delay(static_cast<Uint32>(frame_delay_ms - delta_ms));
         }
     }
-} //loam
+} // loam

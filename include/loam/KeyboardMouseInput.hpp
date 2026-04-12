@@ -76,7 +76,7 @@ namespace loam {
          * @return the mouse y coordinate
          */
         [[nodiscard]] float get_mouse_y() const {
-            return mouse_x;
+            return mouse_y;
         }
     private:
         static bool keyboard_mouse_instance_exists_please_do_not_make_another;

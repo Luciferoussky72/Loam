@@ -38,4 +38,4 @@ namespace loam {
         std::bernoulli_distribution dist(probability);
         return dist(random_generator);
     }
-} //loam
+} // loam

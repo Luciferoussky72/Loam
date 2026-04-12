@@ -19,4 +19,4 @@ namespace loam {
         Uint64 delta_ms;
 
     };
-} //loam
+} // loam

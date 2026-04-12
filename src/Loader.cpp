@@ -1,4 +1,4 @@
-#include "Loader.hpp"
+#include "loam/Loader.hpp"
 
 
 Loader::Loader(SDL_Renderer* renderer) : renderer(renderer) {
@@ -11,7 +11,7 @@ Loader::~Loader() {
     }
 }
 
-void Loader::loadSprite(const std::string& name, const std::string& path, int width, int height, int framesPerRow, int framesPerSecond) {
+void Loader::loadSprite(std:: name, const std::string& path, int width, int height, int framesPerRow, int framesPerSecond) {
     auto instance = sprites.find(name);
     if (instance != sprites.end()) {
         SDL_Log("Failed to load sprite %s, sprite already loaded!", name.c_str());

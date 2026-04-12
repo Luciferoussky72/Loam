@@ -118,4 +118,4 @@ namespace loam {
         int window_height;
         SDL_Renderer* renderer;
     };
-} //loam
+} // loam

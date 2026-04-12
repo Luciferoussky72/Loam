@@ -1,6 +1,6 @@
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
-#include "Sprite.hpp"
+#include "loam/Sprite.hpp"
 
 Sprite::Sprite(SDL_Renderer* renderer, const char* path, int width, int height, int framesPerRow, float framesPerSecond)
     : frameWidth(width), frameHeight(height), currentFrame(0), framesPerRow(framesPerRow), timeAccumulator(0), timePerFrame(1.0f/framesPerSecond) {
@@ -13,15 +13,6 @@ Sprite::Sprite(SDL_Renderer* renderer, const char* path, int width, int height, 
 
 Sprite::~Sprite() {
     SDL_DestroyTexture(texture);
-}
-
-void Sprite::update(float deltaTime) {
-    timeAccumulator += deltaTime;
-
-    if (timeAccumulator >= timePerFrame) {
-        currentFrame = (currentFrame + 1) % framesPerRow;
-        timeAccumulator = 0;
-    }
 }
 
 void Sprite::render(SDL_Renderer* renderer, float x, float y, float scale, bool flip) {
@@ -39,9 +30,9 @@ void Sprite::render(SDL_Renderer* renderer, float x, float y, float scale, bool 
 
     SDL_RenderTextureRotated(renderer, texture, &srcRect, &destRect, 0.0, nullptr, flipstate);
 }
-void Sprite::setRow(int row) {
+void Sprite::set_row(int row) {
     textureRow = row;
 }
-void Sprite::setAnimationSpeed(float fps) {
+void Sprite::set_animation_speed(float fps) {
     timePerFrame = 1.0f/fps;
 }

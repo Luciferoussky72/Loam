@@ -69,4 +69,4 @@ namespace loam {
 
         return normalized;
     }
-} //loam
+} // loam

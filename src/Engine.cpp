@@ -34,4 +34,4 @@ namespace loam {
                 break;
         }
     }
-} //loam
+} // loam
