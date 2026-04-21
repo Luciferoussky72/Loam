@@ -22,7 +22,7 @@ namespace loam {
 
     GamepadInput::~GamepadInput() {
         if (gamepad) {
-            SDL_free(gamepad);
+            SDL_CloseGamepad(gamepad);
         }
     }
 
@@ -37,7 +37,7 @@ namespace loam {
         if (event->type == SDL_EVENT_GAMEPAD_REMOVED) {
             SDL_Log("Gamepad was disconnected! Attempting to close now.");
             if (gamepad == SDL_GetGamepadFromID(event->gdevice.which)) {
-                SDL_free(gamepad);
+                SDL_CloseGamepad(gamepad);
                 gamepad = nullptr;
                 return;
             }

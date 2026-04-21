@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 4.1)
 project(Loam VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 26)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -freflection")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++26 -freflection")
 
 add_library(Loam STATIC
         src/loam.cpp
@@ -17,6 +17,7 @@ add_library(Loam STATIC
         src/Timer.cpp
         src/Player.cpp
         src/KeyboardMouseInput.cpp
+        src/Math.cpp
 )
 
 

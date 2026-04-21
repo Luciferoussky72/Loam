@@ -6,6 +6,9 @@
 #include "Sprite.hpp"
 
 namespace loam {
+    /**
+     *
+     */
     class Loader {
     public:
         Loader(SDL_Renderer* renderer);
@@ -14,7 +17,7 @@ namespace loam {
         [[nodiscard]] Sprite* getSprite(const std::string& name) const;
     private:
         SDL_Renderer* renderer;
-        std::unordered_map<std::string, Sprite*> sprites;
+        std::unordered_map<std::string, Sprite*, std::hash<std::string>, std::equal_to<>> sprites;
         std::string assetPath;
     };
 } // loam

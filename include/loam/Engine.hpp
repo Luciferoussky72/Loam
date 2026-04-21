@@ -5,7 +5,7 @@
 
 namespace loam {
     /**
-     * Manage the SDL_Window and SDL_Renderer lifecycle in a clean C++ object
+     * Manages the SDL_Window and SDL_Renderer lifecycle in a clean C++ object
      * @author luciferoussky72
      */
     class Engine {
@@ -18,16 +18,7 @@ namespace loam {
          * @param window_height the height of the window
          * @param window_flags flags that the window should use
          */
-        Engine(std::string window_title, int window_width, int window_height, SDL_WindowFlags window_flags);
-        /**
-         * Overload to support string literals for window_title
-         * @note be sure to call this early on so you can use it for other behavior
-         * @param window_title the title of the window
-         * @param window_width the width of the window
-         * @param window_height the height of the window
-         * @param window_flags flags that the window should use
-         */
-        Engine(const char* window_title, int window_width, int window_height, SDL_WindowFlags window_flags);
+        Engine(std::string_view window_title, int window_width, int window_height, SDL_WindowFlags window_flags);
 
         /**
          * Engine has deleted copy and assignment constructors for memory-safety

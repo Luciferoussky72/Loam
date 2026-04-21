@@ -5,7 +5,7 @@
 
 class Camera {
 public:
-    Camera(int width, int height, float startX, float startY, float smoothSpeed);
+    Camera(int width, int height, float smoothSpeed);
     void follow(const Entity& entity, float deltaTime);
     void followAhead(const Entity& entity, float deltaTime, float distanceMult);
     void followWithDeadzone(const Entity& entity, float deltaTime, float deadzoneRadius);

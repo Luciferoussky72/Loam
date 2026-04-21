@@ -11,12 +11,12 @@
 namespace loam {
     /**
      * You're free to use loam::random_device in any of your own code
-     * @note just don't invalidate this variable; you'll probably tear a hole into Fairy Country if you do
+     * @note just don't invalidate this variable; you'll probably end up in Fairy Country if you do
      */
     extern std::random_device random_device;
     /**
      * You're free to use loam::random_generator in any of your own code
-     * @note just don't corrupt this variable; you'll probably open a rift to the Void of no Return if you do
+     * @note just don't corrupt this variable; you'll probably open a rift to the Void of No Return if you do
      */
     extern std::mt19937 random_generator;
 

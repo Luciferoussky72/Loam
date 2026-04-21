@@ -4,7 +4,7 @@
 
 namespace loam {
     /**
-     * A base class for managing other classes and to give
+     * A base class for managing other classes and to give a clean UI around player management with Loam
      */
     class Player {
     public:

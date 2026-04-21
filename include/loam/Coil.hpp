@@ -10,10 +10,10 @@ namespace loam {
     /**
      * Provides utilities to manage memory similarly to the stack. The idea is to bridge the performance gap between the heap and stack
      * @author luciferoussky72
-     * @note be sure to explicitly call destructors if memory is allocated to store objects!
      * @note
      * Q: Why is it a coil?
      * A: It's more interesting of a name than "Arena" and gets across how this class differs from a traditional arena
+     * @note this object cannot store objects with nontrivial destructors; use other allocators for non-POD types
      */
     class Coil {
     public:
@@ -33,30 +33,33 @@ namespace loam {
         /**
          * Copy constructor deleted because it doesn't make sense to copy a Coil
          */
-        Coil(const Coil&) = delete;
+        Coil(const Coil&) = delete("Copy constructor deleted because it doesn't make sense to copy a Coil");
         /**
          * Copying via the = operator is deleted because it doesn't make sense to copy a Coil
          */
-        Coil& operator=(const Coil&) = delete;
+        Coil& operator=(const Coil&) = delete("Copying via the = operator is deleted because it doesn't make sense to copy a Coil");
         /**
          * Moving is deleted because it would invalidate any coil_ptr objects from a Coil
          */
-        Coil(Coil&&) = delete;
+        Coil(Coil&&) = delete("Moving is deleted because it would invalidate any coil_ptr objects from a Coil");
         /**
          * Move assignment is deleted because it would invalidate any coil_ptr objects from a Coil
          */
-        Coil& operator=(Coil&&) = delete;
+        Coil& operator=(Coil&&) = delete("Move assignment is deleted because it would invalidate any coil_ptr objects from a Coil");
 
         /**
          * Allocates memory and returns a typed pointer to it
          * @param bytes the amount of bytes to allocate
-         * @throws std::bad_alloc if your allocation would overrun the coil's buffer
+         * @throw std::bad_alloc if your allocation would overrun the coil's buffer
          * @param alignment the byte count will be rounded to the next highest multiple of this; defaults to 8
          * @return a pointer to start of the allocated block of memory
          */
         template <typename T>
+        requires std::is_trivially_destructible_v<T>
         [[nodiscard]] T* alloc(size_t bytes, size_t alignment) {
-            static_assert(std::is_trivially_destructible_v<T>);
+            static_assert(std::is_trivially_destructible_v<T>,
+              "cannot allocate nontrivially destructible types in a Coil; doing so could summon a Time Worm! (may be false)");
+
             bytes = (bytes + alignment - 1) & ~(alignment - 1);
 
             if (current_point + bytes > capacity) {
@@ -71,7 +74,6 @@ namespace loam {
 
         /**
          * Undoes and **invalidates** the last call to alloc or safe_alloc.
-         * @note be sure to explicitly call destructors if memory is allocated to store objects!
          * @note this only works for the last allocation. any more calls will do nothing
          */
         void rewind();
@@ -80,7 +82,6 @@ namespace loam {
          * Sets the current point of the coil to 0, invalidating all memory allocated with it
          * @note using memory after freeing it this way probably won't cause a crash, but is very much UB
          * only call this method when all pointers to this object's data aren't needed anymore
-         * @note be sure to explicitly call destructors if memory is allocated to store objects!
          */
         void unwind();
 
@@ -90,11 +91,12 @@ namespace loam {
          * @throws std::bad_alloc if your allocation would overrun the buffer
          * @param alignment the byte count will be rounded to the next highest multiple of this
          * @return a coil_ptr object that functions similarly to std::weak_ptr
-         * @note be sure to explicitly call destructors if memory is allocated to store objects!
          */
         template <typename T>
+        requires std::is_trivially_destructible_v<T>
         [[nodiscard]] coil_ptr<T> safe_alloc(size_t bytes, size_t alignment = 8) {
-            static_assert(std::is_trivially_destructible_v<T>);
+            static_assert(std::is_trivially_destructible_v<T>,
+                "cannot allocate nontrivially destructible types in a Coil; doing so could summon a Time Worm! (may be false)");
             return coil_ptr<T>(this->alloc<T>(bytes, alignment), *this);
         }
 
@@ -159,19 +161,34 @@ namespace loam {
             raw_ptr = nullptr;
         }
 
-        T& operator* () const {
+        /**
+         * Unsafe, as this does not check if the pointer is still valid
+         */
+        T& operator*() const {
             return *raw_ptr;
         }
-        T* operator-> () const {
+        /**
+         * Unsafe, as this does not check if the pointer is still valid
+         */
+        T* operator->() const {
             return raw_ptr;
         }
-        explicit operator bool () const {
+        /**
+         * Allows you to treat a coil_ptr like a bool in if statements
+         */
+        [[nodiscard]] explicit operator bool() const {
             return static_cast<bool>(raw_ptr);
         }
-        friend std::strong_ordering operator<=>(const coil_ptr& a, const coil_ptr& b) {
+        /**
+         * Compares the objects by their internal pointers' memory addresses
+         */
+        [[nodiscard]] friend std::strong_ordering operator<=>(const coil_ptr& a, const coil_ptr& b) {
             return a.raw_ptr <=> b.raw_ptr;
         }
-        friend bool operator==(const coil_ptr& a, const coil_ptr& b) {
+        /**
+         * Compares the objects by their internal pointers' memory addresses
+         */
+        [[nodiscard]] friend bool operator==(const coil_ptr& a, const coil_ptr& b) {
             return a.raw_ptr == b.raw_ptr;
         }
     private:
