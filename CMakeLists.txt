@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 4.1)
+set(CMAKE_CXX_COMPILER g++-16)
 project(Loam VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 26)
@@ -18,6 +19,7 @@ add_library(Loam STATIC
         src/Player.cpp
         src/KeyboardMouseInput.cpp
         src/Math.cpp
+        src/Math_Header_Tests.cpp
 )
 
 

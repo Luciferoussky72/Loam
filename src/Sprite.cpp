@@ -2,9 +2,9 @@
 #include <SDL3_image/SDL_image.h>
 #include "loam/Sprite.hpp"
 namespace loam {
-    Sprite::Sprite(const Engine& engine, std::string_view path, int frames_per_row, int rows, int fps)
-        : frameWidth(width), frameHeight(height), currentFrame(0), frames_per_row(frames_per_row), time_accumulator(0), time_per_frame(1.0f/framesPerSecond) {
-        texture = IMG_LoadTexture(renderer, path);
+    Sprite::Sprite(const Engine& engine, std::string_view path, int frames_per_row, int rows, int fps, float scale)
+        : frames_per_row(frames_per_row), time_per_frame(1.0f/static_cast<float>(fps)) {
+        texture = IMG_LoadTexture(engine.get_renderer(), path.data());
         if (!texture) {
             SDL_Log("Failed to load texture: %s", SDL_GetError());
         }
