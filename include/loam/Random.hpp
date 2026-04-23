@@ -16,7 +16,7 @@ namespace loam {
     extern std::random_device random_device;
     /**
      * You're free to use loam::random_generator in any of your own code
-     * @note just don't corrupt this variable; you'll probably open a rift to the Void of No Return if you do
+     * @note just don't corrupt this variable; you'll probably open a rift to the Fairy Isles
      */
     extern std::mt19937 random_generator;
 

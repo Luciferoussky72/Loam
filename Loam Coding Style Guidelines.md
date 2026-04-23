@@ -181,7 +181,7 @@ That said, I must highlight that Google's C++ style guide actually has this same
 
 ##### Passing by **constant** pointer (don't do this ever):
 ```c++
-    //this is the syntax for passing by constant pointer reference
+    //this is the syntax for passing by constant pointer
     void func(const int* x);
 ```
 
@@ -203,8 +203,9 @@ Both the stack and Coils allocate memory by simply moving a pointer. The heap ha
 Yes, but a good sign you're being responsible with the heap is if the only new and delete calls are in object constructors. Not only does this make your code more memory-safe, it makes heap
 allocation pauses easier to reason about, as an object being constructed basically says "hey, the program may lag here because we're allocating heap memory"
 
-Also, ideally you should load textures and other things into dynamic memory when your program starts. This keeps frame times predictable for the rest of your program, as well, with no more heap allocations needed, 
-there won't be any more pauses from heap allocations!
+Also, ideally you should load textures and other things into dynamic memory when your program starts. 
+This keeps frame times predictable for the rest of your program, as, well, with no more heap allocations needed, 
+there won't be more pauses from heap allocations!
 
 
 
