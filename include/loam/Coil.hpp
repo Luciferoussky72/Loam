@@ -21,7 +21,7 @@ namespace loam {
      * A: It's more interesting of a name than "Arena" and gets across how this class differs from a traditional arena
      * @note this object cannot store objects with nontrivial destructors; use other allocators for non-POD types
      */
-    template<size_t coil_ptr_Slots = 512, bool Enable_coil_ptr = true>
+    template<size_t coil_ptr_slot_count = 512, bool enable_coil_ptr = true>
     class Coil {
     public:
         template <typename T>
@@ -96,7 +96,7 @@ namespace loam {
             current_point -= size_of_last_alloc;
             size_of_last_alloc = 0;
 
-            if constexpr (Enable_coil_ptr) {
+            if constexpr (enable_coil_ptr) {
                 if (last_alloc_was_safe) {
                     coil_ptr_slots[current_slot-1] = false;
                     last_alloc_was_safe = false;
@@ -112,7 +112,7 @@ namespace loam {
             current_point = 0;
             size_of_last_alloc = 0;
 
-            if constexpr (!Enable_coil_ptr) return;
+            if constexpr (!enable_coil_ptr) return;
 
             num_unwinds++;
             for (size_t i = 0; i < current_slot; ++i) {
@@ -130,12 +130,12 @@ namespace loam {
         template <typename T>
         requires std::is_trivially_destructible_v<T>
         [[nodiscard]] coil_ptr<T> safe_alloc(size_t bytes, size_t alignment = 8) {
-            static_assert(Enable_coil_ptr, "The Enable_coil_ptr template parameter must be true to use safe_alloc!");
+            static_assert(enable_coil_ptr, "The Enable_coil_ptr template parameter must be true to use safe_alloc!");
             static_assert(std::is_trivially_destructible_v<T>,
                 "Cannot allocate nontrivially destructible types in a Coil; "
                 "doing so would send your program to The Void of No Return! (may be false)");
 
-            assert(current_slot < coil_ptr_Slots && "Ran out of coil_ptr slots! Allocate more!");
+            assert(current_slot < coil_ptr_slot_count && "Ran out of coil_ptr slots! Allocate more!");
             coil_ptr_slots[current_slot] = true;
             T* tmp = this->alloc<T>(bytes, alignment);
             last_alloc_was_safe = true;
@@ -149,7 +149,7 @@ namespace loam {
         size_t current_point = 0;
 
         size_t num_unwinds = 0;
-        bool coil_ptr_slots[coil_ptr_Slots] = {false};
+        bool coil_ptr_slots[coil_ptr_slot_count] = {false};
         size_t current_slot = 0;
         bool last_alloc_was_safe = false;
     };

@@ -18,7 +18,6 @@ add_library(Loam STATIC
         src/Player.cpp
         src/KeyboardMouseInput.cpp
         src/Math.cpp
-        src/Math_Header_Tests.cpp
 )
 
 

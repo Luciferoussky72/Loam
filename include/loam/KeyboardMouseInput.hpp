@@ -1,19 +1,22 @@
 #pragma once
 
 #include <SDL3/SDL.h>
-#include <exception>
 
 namespace loam {
     /**
-     * Wraps keyboard/mouse type input specifically
-     * @throw loam::keyboard_initialization_input_error for trying to create more than one instance of this class
+     * Meant to give a cleaner way to refer to SDL mouse buttons
      */
-    class KeyboardMouseInput;
-    /**
-     * Error class for attempting to make more than one loam::KeyboardMouseInput object
-     */
-    class keyboard_initialization_input_error;
+    enum class MouseButton {
+        left_click = 1,
+        middle_click,
+        right_click,
+        button_x1,
+        button_x2
+    };
 
+    /**
+     * Wraps keyboard/mouse type input specifically
+     */
     class KeyboardMouseInput {
     public:
         /**
@@ -51,19 +54,19 @@ namespace loam {
          * @param button the mouse button to check for
          * @return true if the mouse button is down
          */
-        [[nodiscard]] bool is_mouse_button_down(int button) const;
+        [[nodiscard]] bool is_mouse_button_down(MouseButton button) const;
         /**
          * Checks if a mouse button is down
          * @param button the mouse button to check for
          * @return true if the mouse button is down
          */
-        [[nodiscard]] bool is_mouse_button_pressed(int button) const;
+        [[nodiscard]] bool is_mouse_button_pressed(MouseButton button) const;
         /**
          * Checks if a mouse button is down
          * @param button the mouse button to check for
          * @return true if the mouse button is down
          */
-        [[nodiscard]] bool is_mouse_button_released(int button) const;
+        [[nodiscard]] bool is_mouse_button_released(MouseButton button) const;
         /**
          * Gets the mouse's x coordinate
          * @return the mouse x coordinate
@@ -89,11 +92,4 @@ namespace loam {
         const bool* current_key_state;
         bool previous_key_state[SDL_SCANCODE_COUNT] = {false};
     };
-    class keyboard_initialization_input_error : public std::exception {
-    public:
-        [[nodiscard]] const char* what() const noexcept override {
-            return "Error: You can't make more than one instance of loam::KeyboardMouseInput";
-        }
-    };
-
 } // loam

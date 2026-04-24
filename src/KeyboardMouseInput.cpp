@@ -1,22 +1,13 @@
 #include "loam/KeyboardMouseInput.hpp"
 
+#include <cstdlib>
 #include <cstring>
 
 namespace loam {
-    /**
-     * Meant to give a cleaner way to refer to SDL mouse buttons
-     */
-    enum class MouseButtons {
-        left_click = 1,
-        middle_click,
-        right_click,
-        button_x1,
-        button_x2
-    };
-
     KeyboardMouseInput::KeyboardMouseInput() {
         if (keyboard_mouse_instance_exists_please_do_not_make_another) {
-            throw keyboard_initialization_input_error();
+            SDL_Log("You can't make more than one KeyboardMouseInput instance.");
+            std::abort();
         }
         keyboard_mouse_instance_exists_please_do_not_make_another = true;
         current_key_state = SDL_GetKeyboardState(nullptr);
@@ -45,17 +36,17 @@ namespace loam {
         return !current_key_state[key] and previous_key_state[key];
     }
 
-    bool KeyboardMouseInput::is_mouse_button_down(int button) const {
-        return current_mouse_state & SDL_BUTTON_MASK(button);
+    bool KeyboardMouseInput::is_mouse_button_down(MouseButton button) const {
+        return current_mouse_state & SDL_BUTTON_MASK(static_cast<uint>(button));
     }
 
-    bool KeyboardMouseInput::is_mouse_button_pressed(int button) const {
-        return (current_mouse_state & SDL_BUTTON_MASK(button)) and
-               !(previous_mouse_state & SDL_BUTTON_MASK(button));
+    bool KeyboardMouseInput::is_mouse_button_pressed(MouseButton button) const {
+        return (current_mouse_state & SDL_BUTTON_MASK(static_cast<uint>(button))) and
+               !(previous_mouse_state & SDL_BUTTON_MASK(static_cast<uint>(button)));
     }
 
-    bool KeyboardMouseInput::is_mouse_button_released(int button) const {
-        return !(current_mouse_state & SDL_BUTTON_MASK(button)) and
-               (previous_mouse_state & SDL_BUTTON_MASK(button));
+    bool KeyboardMouseInput::is_mouse_button_released(MouseButton button) const {
+        return !(current_mouse_state & SDL_BUTTON_MASK(static_cast<uint>(button))) and
+               (previous_mouse_state & SDL_BUTTON_MASK(static_cast<uint>(button)));
     }
 } // loam
