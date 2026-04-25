@@ -17,12 +17,17 @@ namespace loam {
     /**
      * Wraps keyboard/mouse type input specifically
      */
-    class KeyboardMouseInput {
+    class KeyboardMouse {
     public:
         /**
-         * Constructs a KeyboardMouseInput object
+         * Constructs a KeyboardMouse object
          */
-        KeyboardMouseInput();
+        KeyboardMouse();
+
+        /**
+         * Simple destructor that flips keyboard_mouse_instance_exists_please_do_not_make_another back to false
+         */
+        ~KeyboardMouse();
 
         /**
          * Updates the object with the newest state of keyboard and mouse input devices
@@ -56,13 +61,13 @@ namespace loam {
          */
         [[nodiscard]] bool is_mouse_button_down(MouseButton button) const;
         /**
-         * Checks if a mouse button is down
+         * Checks if a mouse button is pressed
          * @param button the mouse button to check for
          * @return true if the mouse button is down
          */
         [[nodiscard]] bool is_mouse_button_pressed(MouseButton button) const;
         /**
-         * Checks if a mouse button is down
+         * Checks if a mouse button is released
          * @param button the mouse button to check for
          * @return true if the mouse button is down
          */
@@ -82,7 +87,7 @@ namespace loam {
             return mouse_y;
         }
     private:
-        static bool keyboard_mouse_instance_exists_please_do_not_make_another;
+        static bool keyboard_mouse_instance_exists_please_do_not_make_another_unless_you_want_to_summon_a_time_worm;
 
         float mouse_x = 0.0f;
         float mouse_y = 0.0f;

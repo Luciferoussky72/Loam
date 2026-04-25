@@ -3,8 +3,8 @@
 /**
  * This is a tiny little header for both kinds of input
  */
-#include <loam/KeyboardMouseInput.hpp>
-#include <loam/GamepadInput.hpp>
+#include <loam/KeyboardMouse.hpp>
+#include <loam/Gamepad.hpp>
 namespace loam {
     enum class InputType {
         KeyboardMouse,

@@ -30,7 +30,7 @@ namespace loam {
         virtual void update(float delta_time);
 
     private:
-        KeyboardMouseInput* keyboard_mouse_input;
-        GamepadInput* gamepad_input;
+        KeyboardMouse* keyboard_mouse_input;
+        Gamepad* gamepad_input;
     };
 } // loam

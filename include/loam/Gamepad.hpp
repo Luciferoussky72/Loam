@@ -8,28 +8,28 @@ namespace loam {
     /**
      * Wraps gamepad input
      */
-    class GamepadInput;
+    class Gamepad;
 
     /**
      * A free function made for probing for new gamepad connections
      * @warning should only be called once per frame/update cycle; calling this multiple times will
-     * cause a gamepad to be claimed twice, leading to being captured by a theater-loving merman! (that last part may not be true)
-     * @return an instance of std::optional<GamepadInput> for instantiating a new gamepad
+     * cause a gamepad to be claimed twice, sending your program into The Void of No Return! (that last part may not be true)
+     * @return an instance of std::optional<Gamepad> for instantiating a new gamepad
      */
-    std::optional<GamepadInput> probe_for_gamepads(const SDL_Event* event);
+    std::optional<Gamepad> probe_for_gamepads(const SDL_Event* event);
 
-    class GamepadInput {
+    class Gamepad {
     public:
         /**
-         * Constructs a GamepadInput object
+         * Constructs a Gamepad object
          * @param gamepad a pointer to the SDL_Gamepad to build the object from
          */
-        GamepadInput(SDL_Gamepad* gamepad);
+        Gamepad(SDL_Gamepad* gamepad);
 
         /**
          * Frees the instance's gamepad
          */
-        ~GamepadInput();
+        ~Gamepad();
 
         /**
          * Updates the object's data
