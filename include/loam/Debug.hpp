@@ -4,11 +4,12 @@
  * Provides utilities for debugging and testing with Loam
  * @author luciferoussky72
  * @note this header heavily uses reflection; it's therefore heavily commented because many C++ developers are unfamiliar
- * with the concept, and editor tooling has been slow to adopt it- at the time of writing, Clangd is completely reflection-blind
+ * with the concept, and editor tooling has been slow to adopt it- at the time of writing, Clangd is still mostly reflection-blind
  */
 #include <type_traits>
 #include <iostream>
 #include <meta>
+#include <functional>
 
 namespace loam {
     /**
@@ -25,13 +26,14 @@ namespace loam {
         static constexpr auto members = std::define_static_array(
             //the ^^ operator is the "reflection operator." it returns special metadata about a type
             //note: the reflection operator also gets called the "cat-ears operator" and "unibrow operator"
-            std::meta::nonstatic_data_members_of(^^T, std::meta::access_context::current())
+            std::meta::nonstatic_data_members_of(^^T, std::meta::access_context::unchecked())
         );
 
         //loop through all the members and print their names and values
         template for (constexpr auto m : members) {
-            //enter a recursive call if the class has a another class as its member
+            //enter a recursive call if the class has an instance of another class as its member
             if constexpr (std::is_aggregate_v<decltype(obj.[:m:])>) {
+                stream << std::meta::identifier_of(m) << ":\n";
                 log_class(obj.[:m:], stream);
             } else {
                 //the [: :] operator is the "splicer," which basically is the opposite of the reflection operator
@@ -69,5 +71,21 @@ namespace loam {
                 return std::meta::identifier_of(e);
         }
         return "enum member is lost in Fairy Country. (enum member not found)";
+    }
+
+    /**
+     * Calls a function and prints its results for debugging purposes
+     * @param function the function to call; must take one numeric argument
+     * @param start the number to start with
+     * @param stop the number to stop with
+     * @param step the step to take between calls; defaults to 1
+     * @param stream the stream to use; defaults to std::clog
+     */
+    template <typename T, typename F>
+    requires std::is_arithmetic_v<T> && std::invocable<F, T>
+    void step_through(F&& function, T start, T stop, T step = static_cast<T>(1), std::ostream& stream = std::clog) {
+        for (T i = start; i <= stop; i += step) {
+            stream << "\nInput: " << i << " Result: " << function(i);
+        }
     }
 } // loam
