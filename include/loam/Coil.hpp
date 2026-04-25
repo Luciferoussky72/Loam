@@ -7,6 +7,7 @@
 namespace loam {
     /**
      * A special pointer class for safely managing Coil memory
+     * @author luciferoussky72
      * @tparam T the type of the pointer that the object holds
      */
     template <typename T>

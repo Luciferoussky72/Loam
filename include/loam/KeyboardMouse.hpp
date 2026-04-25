@@ -16,6 +16,7 @@ namespace loam {
 
     /**
      * Wraps keyboard/mouse type input specifically
+     * @author luciferoussky72
      */
     class KeyboardMouse {
     public:

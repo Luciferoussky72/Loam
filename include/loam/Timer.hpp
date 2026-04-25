@@ -3,6 +3,10 @@
 #include <SDL3/SDL.h>
 
 namespace loam {
+    /**
+     * Wraps time management with SDL
+     * @author luciferoussky72
+     */
     class Timer {
     public:
         Timer(int target_frames_per_second);

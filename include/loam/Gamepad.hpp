@@ -7,6 +7,7 @@
 namespace loam {
     /**
      * Wraps gamepad input
+     * @author luciferoussky72
      */
     class Gamepad;
 

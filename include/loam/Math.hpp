@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * Provides various math utilities that aren't already in the C++ STL
+ * @author luciferoussky72
+ */
 #include <algorithm>
 #include <array>
 #include <cassert>

@@ -3,7 +3,7 @@
 
 namespace loam {
     Timer::Timer(int target_frames_per_second)
-        : target_frames_per_second(target_frames_per_second), frame_delay_ms(1000/target_frames_per_second), last_time(SDL_GetTicks()), delta_ms(0){
+        : target_frames_per_second(target_frames_per_second), frame_delay_ms(1000/target_frames_per_second), last_time(SDL_GetTicks()), delta_ms(0) {
 
     }
 
