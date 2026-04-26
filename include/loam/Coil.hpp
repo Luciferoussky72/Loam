@@ -46,21 +46,10 @@ namespace loam {
             delete[] data;
         }
 
-        /**
-         * Copy constructor deleted because it doesn't make sense to copy a Coil
-         */
+
         Coil(const Coil&) = delete("Copy constructor deleted because it doesn't make sense to copy a Coil");
-        /**
-         * Copying via the = operator is deleted because it doesn't make sense to copy a Coil
-         */
         Coil& operator=(const Coil&) = delete("Copying via the = operator is deleted because it doesn't make sense to copy a Coil");
-        /**
-         * Moving is deleted because it would invalidate any coil_ptr objects from a Coil
-         */
         Coil(Coil&&) = delete("Moving is deleted because it would invalidate any coil_ptr objects from a Coil");
-        /**
-         * Move assignment is deleted because it would invalidate any coil_ptr objects from a Coil
-         */
         Coil& operator=(Coil&&) = delete("Move assignment is deleted because it would invalidate any coil_ptr objects from a Coil");
 
         /**
@@ -81,7 +70,7 @@ namespace loam {
             assert(current_point + bytes < capacity &&
                 "Coil memory overrun. Allocate more to not send your program to The Void of No Return! (may not actually happen)");
 
-            T* tmp = static_cast<T*>(data + current_point);
+            T* tmp = reinterpret_cast<T*>(data + current_point);
             current_point += bytes;
             size_of_last_alloc = bytes;
             last_alloc_was_safe = false;
@@ -131,7 +120,7 @@ namespace loam {
         template <typename T>
         requires std::is_trivially_destructible_v<T>
         [[nodiscard]] coil_ptr<T> safe_alloc(size_t bytes, size_t alignment = 8) {
-            static_assert(enable_coil_ptr, "The Enable_coil_ptr template parameter must be true to use safe_alloc!");
+            static_assert(enable_coil_ptr, "The enable_coil_ptr template parameter must be true to use safe_alloc!");
             static_assert(std::is_trivially_destructible_v<T>,
                 "Cannot allocate nontrivially destructible types in a Coil; "
                 "doing so would send your program to The Void of No Return! (may be false)");
