@@ -18,6 +18,7 @@ add_library(Loam STATIC
         src/Player.cpp
         src/KeyboardMouse.cpp
         src/Math.cpp
+        include/loam/Component.hpp
 )
 
 

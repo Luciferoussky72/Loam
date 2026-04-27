@@ -1,31 +1,32 @@
 #include "loam/Loader.hpp"
+#include <SDL3_image/SDL_image.h>
 
 namespace loam {
-    Loader::Loader(SDL_Renderer* renderer) : renderer(renderer) {
-        assetPath = std::string(SDL_GetBasePath());
+    Loader::Loader(const Engine& engine) : engine(engine) {
+        asset_path = std::string(SDL_GetBasePath());
     }
 
     Loader::~Loader() {
-        for (auto& sprite : sprites) {
-            delete sprite.second;
+        for (auto& slot : texture_storage) {
+            SDL_DestroyTexture(slot.second);
         }
     }
 
-    void Loader::loadSprite(std::string_view name, const std::string& path, int width, int height, int framesPerRow, int framesPerSecond) {
-        auto instance = sprites.find(name);
-        if (instance != sprites.end()) {
-            SDL_Log("Failed to load sprite %s, sprite already loaded!", name.c_str());
+    void Loader::load_texture(std::string_view name, std::string_view path) {
+        auto instance = texture_storage.find(name.data());
+        if (instance != texture_storage.end()) {
+            SDL_Log("Failed to load sprite %s, sprite already loaded!", name.data());
             return;
         }
 
-        sprites[name] = Sprite(renderer, (assetPath + path).c_str(), width, height, framesPerRow, framesPerSecond);
+        texture_storage[name.data()] = IMG_LoadTexture(engine.get_renderer(), (asset_path + path).c_str());
     }
 
-    Sprite* Loader::getSprite(const std::string& name) const {
-        auto it = sprites.find(name);
-        if (it != sprites.end()) {
-            return it->second;
+    std::expected<SDL_Texture*, std::string> Loader::get_texture(std::string_view name) const {
+        auto it = texture_storage.find(name.data());
+        if (it == texture_storage.end()) {
+            return std::unexpected(std::string("Failed to load texture \"") + name + '\"');
         }
-        return nullptr;
+        return it->second;
     }
 } // loam

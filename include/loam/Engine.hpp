@@ -101,12 +101,13 @@ namespace loam {
             return renderer;
         }
     private:
-        bool running;
 
-        SDL_Window* window;
         std::string window_title;
+        SDL_Window* window;
+        SDL_Renderer* renderer;
         int window_width;
         int window_height;
-        SDL_Renderer* renderer;
+
+        bool running;
     };
 } // loam
