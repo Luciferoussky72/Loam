@@ -1,7 +1,6 @@
 #pragma once
 
 #include <SDL3/SDL.h>
-#include "Component.hpp"
 #include "Engine.hpp"
 
 namespace loam {
@@ -10,10 +9,8 @@ namespace loam {
      * @note if you need to render whole scenes, look at the Tilemap class instead
      * @author luciferoussky72
      */
-    class Sprite : public Component {
+    class Sprite {
     public:
-        friend class Entity;
-
         /**
          * Constructs a Sprite object, which wraps SDL rendering and textures
          * @param engine the Engine the object should use for rendering calls
@@ -26,13 +23,15 @@ namespace loam {
         Sprite(const Engine& engine, SDL_Texture* texture, uint frames_per_row, uint rows, uint fps, float scale = 1.0f);
 
         /**
-         * Destructor for Sprite
+         * Draws a Sprite to the screen
+         * @param frame the frame of the spritesheet to draw
+         * @param row the row of the spritesheet to get the frame from
+         * @param x the x coordinate to draw the sprite
+         * @param y the y coordinate to draw the sprite
+         * @param flip_x whether to flip the image horizontally
+         * @param flip_y whether to flip the image vertically
          */
-        ~Sprite() override;
-
-        void update(Entity* e) override;
-
-        void draw(Entity* e) override;
+        void draw(uint frame, uint row, float x, float y, bool flip_x = false, bool flip_y = false) const;
 
         /**
          * Sets the frames per second
@@ -51,9 +50,6 @@ namespace loam {
         uint frame_height;
         uint frames_per_row;
         uint rows;
-
-        uint frame = 0;
-        uint row = 0;
 
         //timing variables
         float time_per_frame;

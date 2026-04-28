@@ -7,9 +7,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++26 -freflection")
 
 add_library(Loam STATIC
         src/loam.cpp
-        src/Camera.cpp
         src/Engine.cpp
-        src/Entity.cpp
         src/Gamepad.cpp
         src/Loader.cpp
         src/Random.cpp
@@ -17,8 +15,6 @@ add_library(Loam STATIC
         src/Timer.cpp
         src/Player.cpp
         src/KeyboardMouse.cpp
-        src/Math.cpp
-        include/loam/Component.hpp
 )
 
 

@@ -1,33 +1,29 @@
 #pragma once
 
-#include <cstddef>
-#include <type_traits>
 #include <cassert>
+#include <cstddef>
 #include <compare>
 #include <new>
 
 namespace loam {
     template <typename T2>
-    requires std::is_trivially_destructible_v<T2>
     class cache_ptr;
 
     /**
      * Manages a contiguous block of memory on the heap.
      * @author luciferoussky72
-     * @note has some key differences from Coil, like being able to store only one type, being able to only grow or be cleared,
-     * and having less overhead
+     * @note has some key differences from Coil and std::vector, like being able to store only one type,
+     * being able to only grow or be cleared, and having less overhead
      * @note references and pointers into Cache memory are *guaranteed* to stay valid *until the Cache is cleared*
-     * @tparam T the type of variables that the Cache will store; must be trivially destructible
+     * @tparam T the type of variables that the Cache will store
      */
     template <typename T>
-    requires std::is_trivially_destructible_v<T>
     class Cache {
     public:
         /**
          * A companion class for safely storing references to Cache memory
          */
         template <typename T2>
-        requires std::is_trivially_destructible_v<T2>
         friend class cache_ptr;
 
         /**
@@ -67,9 +63,15 @@ namespace loam {
         }
 
         /**
-         * Clears a Cache, which is a very fast operation considering we are only changing two variables
+         * Clears a Cache, which is a very fast operation for trivial types, considering we are only changing two variables,
+         * but if the Cache's type is not trivially destructible, we have to walk it and call destructors
          */
         void clear() {
+            if constexpr (!std::is_trivially_destructible_v<T>) {
+                for (size_t i = 0; i < current_point; ++i) {
+                    memory[i].~T();
+                }
+            }
             current_point = 0;
             generation++;
         }
@@ -149,7 +151,6 @@ namespace loam {
     };
 
     template <typename T2>
-    requires std::is_trivially_destructible_v<T2>
     class cache_ptr {
     public:
         /**

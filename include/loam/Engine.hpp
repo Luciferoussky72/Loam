@@ -5,7 +5,7 @@
 
 namespace loam {
     /**
-     * Manages the SDL_Window and SDL_Renderer lifecycle in a clean C++ object
+     * Manages SDL in a clean C++ object
      * @author luciferoussky72
      */
     class Engine {
@@ -13,18 +13,22 @@ namespace loam {
         /**
          * Constructs an Engine object
          * @note be sure to call this early on so you can use it for other behavior
+         * @param SDL_flags the flags to initialize SDL with
          * @param window_title the title of the window
          * @param window_width the width of the window
          * @param window_height the height of the window
          * @param window_flags flags that the window should use
          */
-        Engine(std::string_view window_title, int window_width, int window_height, SDL_WindowFlags window_flags);
+        Engine(SDL_InitFlags SDL_flags, std::string_view window_title, int window_width, int window_height, SDL_WindowFlags window_flags);
 
         /**
-         * Engine has deleted copy and assignment constructors for memory-safety
+         * Engine has deleted copy and move constructors to not send programs to Fairy Country
          */
-        Engine(const Engine&) = delete;
-        Engine& operator=(const Engine&) = delete;
+        Engine(const Engine&) = delete("I don't want you copying Engines and sending programs to Fairy Country!");;
+        Engine& operator=(const Engine&) = delete("I don't want you copying Engines with the = operator and sending programs to Fairy Country!");;
+        Engine(Engine&&) = delete("I don't want you moving Engines and sending programs to Fairy Country!");
+        Engine& operator=(Engine&&) = delete("I don't want you moving Engines with the = operator and sending programs to Fairy Country!");;
+
 
         /**
          * Destroys the attached renderer and window

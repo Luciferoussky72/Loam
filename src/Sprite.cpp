@@ -17,27 +17,25 @@ namespace loam {
         SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
     }
 
-    Sprite::~Sprite() = default;
-
-    void Sprite::draw(Entity* e) {
-        SDL_FRect srcRect = {
+    void Sprite::draw(uint frame, uint row, float x, float y, bool flip_x, bool flip_y) const {
+        SDL_FRect src_rect = {
             static_cast<float>(frame * frame_width),
             static_cast<float>(row * frame_height),
             static_cast<float>(frame_width),
             static_cast<float>(frame_height)
         };
 
-        SDL_FRect destRect = {e->x, e->y,
+        SDL_FRect dest_rect = {x, y,
             static_cast<float>(frame_width) * scale,
             static_cast<float>(frame_height) * scale};
 
         SDL_FlipMode flip_state;
-        if (e->flip_x) {
-            flip_state = e->flip_y ? SDL_FLIP_HORIZONTAL_AND_VERTICAL : SDL_FLIP_HORIZONTAL;
+        if (flip_x) {
+            flip_state = flip_y ? SDL_FLIP_HORIZONTAL_AND_VERTICAL : SDL_FLIP_HORIZONTAL;
         } else {
-            flip_state = e->flip_y ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
+            flip_state = flip_y ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
         }
 
-        SDL_RenderTextureRotated(engine.get_renderer(), texture, &srcRect, &destRect, 0.0, nullptr, flip_state);
+        SDL_RenderTextureRotated(engine.get_renderer(), texture, &src_rect, &dest_rect, 0.0, nullptr, flip_state);
     }
 } // loam

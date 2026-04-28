@@ -23,4 +23,10 @@ namespace loam {
         Uint64 delta_ms;
 
     };
+
+    /**
+     * Calls SDL_GetTicks. Mostly a convenience wrapper
+     * @return the number of ticks since SDL_Init was called
+     */
+    uint64_t time();
 } // loam

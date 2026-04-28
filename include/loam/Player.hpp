@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Input.hpp"
+#include "KeyboardMouse.hpp"
+#include "Gamepad.hpp"
 
 namespace loam {
     /**
@@ -14,7 +15,6 @@ namespace loam {
          * @note input_type should be either:
          * KeyboardMouse - gives the class a KeyboardMouseInput instance as an input source
          * Gamepad - gives the class a GamepadInput instance as an input source
-         * @throw loam::keyboard_initialization_input_error for making more than one Player instance with KeyboardMouseInput
          */
         Player(InputType input_type);
 
