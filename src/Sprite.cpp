@@ -1,9 +1,10 @@
 #include <SDL3/SDL.h>
 #include "loam/Sprite.hpp"
+#include "loam/Engine.hpp"
 
 
 namespace loam {
-    Sprite::Sprite(const Engine& engine, SDL_Texture* texture, uint frames_per_row, uint rows, uint fps, float scale)
+    Sprite::Sprite(const Engine& engine, SDL_Texture* texture, uint32_t frames_per_row, uint32_t rows, uint32_t fps, float scale)
         : engine(engine),
         frames_per_row(frames_per_row), rows(rows),
         time_per_frame(1.0f / static_cast<float>(fps)),
@@ -12,12 +13,12 @@ namespace loam {
         float total_width;
         float total_height;
         SDL_GetTextureSize(texture, &total_width, &total_height);
-        frame_width = static_cast<uint>(total_height) / frames_per_row;
-        frame_height = static_cast<uint>(total_height) / rows;
+        frame_width = static_cast<uint32_t>(total_height) / frames_per_row;
+        frame_height = static_cast<uint32_t>(total_height) / rows;
         SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
     }
 
-    void Sprite::draw(uint frame, uint row, float x, float y, bool flip_x, bool flip_y) const {
+    void Sprite::draw(uint32_t frame, uint32_t row, float x, float y, bool flip_x, bool flip_y) const {
         SDL_FRect src_rect = {
             static_cast<float>(frame * frame_width),
             static_cast<float>(row * frame_height),

@@ -2,11 +2,13 @@
 
 namespace loam {
     Engine::Engine(SDL_InitFlags SDL_flags, std::string_view window_title, int window_width, int window_height, SDL_WindowFlags window_flags)
-        : window_title(window_title), window_width(window_width), window_height(window_height), running(true) {
-        //initialize SDL and create the window and renderer
-        SDL_Init(SDL_flags);
-        window = SDL_CreateWindow(window_title.data(), window_width, window_height, window_flags);
-        renderer = SDL_CreateRenderer(window, nullptr);
+        : window_title(window_title), window_width(window_width), window_height(window_height) {
+
+        if (SDL_Init(SDL_flags)) {
+            window = SDL_CreateWindow(window_title.data(), window_width, window_height, window_flags);
+            renderer = SDL_CreateRenderer(window, nullptr);
+        }
+
     }
 
     Engine::~Engine() {

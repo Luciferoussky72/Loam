@@ -12,7 +12,7 @@ namespace loam {
     /**
      * Manages a contiguous block of memory on the heap.
      * @author luciferoussky72
-     * @note has some key differences from Coil and std::vector, like being able to store only one type,
+     * @note has some key differences from Coil and std::vector, like being fixed-size after creation, able to store only one type,
      * being able to only grow or be cleared, and having less overhead
      * @note references and pointers into Cache memory are *guaranteed* to stay valid *until the Cache is cleared*
      * @tparam T the type of variables that the Cache will store
@@ -192,13 +192,13 @@ namespace loam {
         /**
          * Unsafe, as this does not check if the pointer is still valid
          */
-        T2& operator*() const {
+        T2& operator*() {
             return *raw_ptr;
         }
         /**
          * Unsafe, as this does not check if the pointer is still valid
          */
-        T2* operator->() const {
+        T2* operator->() {
             return raw_ptr;
         }
         /**

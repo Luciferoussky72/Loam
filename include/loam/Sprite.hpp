@@ -1,9 +1,11 @@
 #pragma once
 
 #include <SDL3/SDL.h>
-#include "Engine.hpp"
+
 
 namespace loam {
+    class Engine;
+
     /**
      * Wraps SDL sprite management and texture rendering
      * @note if you need to render whole scenes, look at the Tilemap class instead
@@ -20,7 +22,7 @@ namespace loam {
          * @param fps the fps that the sprite should have - changeable later
          * @param scale the scale at which to size up the sprite; defaults to 1.0f
          */
-        Sprite(const Engine& engine, SDL_Texture* texture, uint frames_per_row, uint rows, uint fps, float scale = 1.0f);
+        Sprite(const Engine& engine, SDL_Texture* texture, uint32_t frames_per_row, uint32_t rows, uint32_t fps, float scale = 1.0f);
 
         /**
          * Draws a Sprite to the screen
@@ -28,10 +30,10 @@ namespace loam {
          * @param row the row of the spritesheet to get the frame from
          * @param x the x coordinate to draw the sprite
          * @param y the y coordinate to draw the sprite
-         * @param flip_x whether to flip the image horizontally
-         * @param flip_y whether to flip the image vertically
+         * @param flip_x whether to flip the image horizontally; defaults to false
+         * @param flip_y whether to flip the image vertically; defaults to false
          */
-        void draw(uint frame, uint row, float x, float y, bool flip_x = false, bool flip_y = false) const;
+        void draw(uint32_t frame, uint32_t row, float x, float y, bool flip_x = false, bool flip_y = false) const;
 
         /**
          * Sets the frames per second
@@ -46,10 +48,10 @@ namespace loam {
         const Engine& engine;
         
         //animation variables
-        uint frame_width;
-        uint frame_height;
-        uint frames_per_row;
-        uint rows;
+        uint32_t frame_width;
+        uint32_t frame_height;
+        uint32_t frames_per_row;
+        uint32_t rows;
 
         //timing variables
         float time_per_frame;

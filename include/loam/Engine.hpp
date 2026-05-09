@@ -11,7 +11,7 @@ namespace loam {
     class Engine {
     public:
         /**
-         * Constructs an Engine object
+         * Constructs an Engine object and initializes SDL for you
          * @note be sure to call this early on so you can use it for other behavior
          * @param SDL_flags the flags to initialize SDL with
          * @param window_title the title of the window
@@ -21,9 +21,8 @@ namespace loam {
          */
         Engine(SDL_InitFlags SDL_flags, std::string_view window_title, int window_width, int window_height, SDL_WindowFlags window_flags);
 
-        /**
-         * Engine has deleted copy and move constructors to not send programs to Fairy Country
-         */
+        
+
         Engine(const Engine&) = delete("I don't want you copying Engines and sending programs to Fairy Country!");;
         Engine& operator=(const Engine&) = delete("I don't want you copying Engines with the = operator and sending programs to Fairy Country!");;
         Engine(Engine&&) = delete("I don't want you moving Engines and sending programs to Fairy Country!");
@@ -31,7 +30,7 @@ namespace loam {
 
 
         /**
-         * Destroys the attached renderer and window
+         * Destroys the attached renderer and window, and quits SDL for you
          * @note the best practice is usually to have your code set up so your Engine's destructor runs at the end of main()
          */
         ~Engine();
@@ -112,6 +111,6 @@ namespace loam {
         int window_width;
         int window_height;
 
-        bool running;
+        bool running = true;
     };
 } // loam

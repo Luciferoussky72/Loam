@@ -25,7 +25,7 @@ namespace loam {
      */
     template <typename T>
     requires std::is_arithmetic_v<T>
-    double sqrt_lookup(T n);
+    float sqrt_lookup(T n);
 
     /**
      * The constant that defines the max number that loam::sqrt_lookup will work with
@@ -41,9 +41,9 @@ namespace loam {
      * @param n the number to take the square root of
      * @return the square root of n
      */
-    consteval double compile_time_sqrt(double n) {
+    consteval float compile_time_sqrt(float n) {
         if (n == 0.0) return 0.0;
-        double r = n;
+        float r = n;
         for (int i = 0; i < 20; i++)
             r = 0.5 * (r + n / r);
         return r;
@@ -53,10 +53,10 @@ namespace loam {
      * Makes a square root lookup table up to SQRT_MAX
      * @return an std::array containing the lookup table entries
      */
-    consteval std::array<double, SQRT_MAX> make_sqrt_table() {
-        std::array<double, SQRT_MAX> result{};
+    consteval std::array<float, SQRT_MAX> make_sqrt_table() {
+        std::array<float, SQRT_MAX> result{};
         for (size_t i = 0; i < SQRT_MAX; i++)
-            result[i] = compile_time_sqrt(static_cast<double>(i));
+            result[i] = compile_time_sqrt(static_cast<float>(i));
         return result;
     }
 
@@ -68,14 +68,14 @@ namespace loam {
 
     template <typename T>
     requires std::is_arithmetic_v<T>
-    double sqrt_lookup(T n) {
+    float sqrt_lookup(T n) {
         static_assert(std::is_arithmetic_v<T>, "Use an arithmetic value for loam::sqrt_lookup!");
         assert(n <= SQRT_MAX && "Went above SQRT_MAX!");
         if constexpr (std::is_floating_point_v<T>) {
             if (n < 1) return std::sqrt(n);
             size_t below = static_cast<size_t>(n);
             size_t above = below + 1;
-            double percent = n - below;
+            float percent = n - below;
             return SQRT_TABLE[below] + percent * (SQRT_TABLE[above] - SQRT_TABLE[below]);
         }
         return SQRT_TABLE[static_cast<size_t>(n)];
@@ -99,8 +99,8 @@ namespace loam {
      * Quality-of-life function for cubing numbers
      * @tparam T the type of the number; must pass std::is_arithmetic
      * @param n the number to cube
-     * @warning this does not check for overflows, so make sure the type is big enough to store the result unless you want to
-     * summon a Time Worm (may not actually happen)
+     * @warning this does not check for overflows, so make sure the type can hold the result unless you want to
+     * see what the inside of a Time Worm's stomach looks like
      * @return the cube of n
      */
     template <typename T>
@@ -147,7 +147,7 @@ namespace loam {
      */
     template<std::floating_point T>
     constexpr T remap(T value, T in_lower_bound, T in_upper_bound, T out_lower_bound, T out_upper_bound) {
-        return lerp(out_lower_bound, out_upper_bound, inv_lerp(in_lower_bound, in_upper_bound, value));
+        return lerp(out_lower_bound, out_upper_bound, inverse_lerp(in_lower_bound, in_upper_bound, value));
     }
 
     /**
