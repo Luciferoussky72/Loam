@@ -22,6 +22,8 @@ namespace loam {
     public:
         /**
          * A companion class for safely storing references to Cache memory
+         * @note while this does check that its reference is still valid, it does that under the assumption that its parent Cache
+         * is still valid
          */
         template <typename T2>
         friend class cache_ptr;
@@ -30,21 +32,28 @@ namespace loam {
          * Constructs a Cache
          * @param size the size of the cache; constant after the object is created!
          */
-        Cache(size_t size) : memory(new (std::nothrow) T[size]), size(size) {}
+        Cache(size_t size) : size(size) {
+            memory = static_cast<T*>(operator new(sizeof(T) * size, std::nothrow));
+        }
 
         /**
          * Checks that a Cache's memory was successfully allocated
          * @return true if the memory is not nullptr
          */
         [[nodiscard]] bool good() const {
-            return memory != nullptr;
+            return memory;
         }
 
         /**
-         * Destroys a cache. Pretty simple because we just have to delete the memory
+         * Destroys a cache. Fast for trivial types, but walks the Cache and calls destructors for nontrivial types
          */
         ~Cache() {
-            delete[] memory;
+            if constexpr (!std::is_trivially_destructible_v<T>) {
+                for (size_t i = 0; i < current_point; ++i) {
+                    memory[i].~T();
+                }
+            }
+            ::operator delete(memory);
         }
 
         Cache(const Cache&) = delete("Copying a Cache would cause strange heap corruptions; sending your program into The Void of No Return!");
@@ -58,8 +67,8 @@ namespace loam {
          */
         void push(const T& value) {
             assert(current_point < size && "Cache overrun! Allocate more memory if you don't want your program to enter The Void of No Return!");
-            memory[current_point] = value;
-            current_point++;
+            new (memory + current_point) T(value);
+            ++current_point;
         }
 
         /**
@@ -73,12 +82,13 @@ namespace loam {
                 }
             }
             current_point = 0;
-            generation++;
+            ++generation;
         }
 
         /**
          * Gets a point in a Cache
-         * @note unchecked, like operator[] overloads in the STL
+         * @note unchecked, like operator[] overloads in the STL;
+         * poking beyond the number of elements that you've pushed to the Cache is undefined behaviour
          * @param n the point to get
          * @return a reference to the point in the cache
          */
@@ -88,12 +98,13 @@ namespace loam {
 
         /**
          * Gets a point in a Cache
-         * @note checked, like .at functions in the STL; use if you don't want to send your program to The Void of No Return!
+         * @note checked against the number of elements you've pushed to the Cache, like .at functions in the STL;
+         * use if you don't want to send your program to The Void of No Return!
          * @param n the point to get
          * @return a reference to the point in the cache
          */
         [[nodiscard]] T& at(size_t n) {
-            assert(n < size && "Tried to poke an out-of-bounds Cache index, which would send the program to The Void of No Return!");
+            assert(n < current_point && "Tried to poke an out-of-bounds Cache index, which would send the program to The Void of No Return!");
             return memory[n];
         }
 
@@ -103,7 +114,7 @@ namespace loam {
          * @return a cache_ptr to the nth slot
          */
         [[nodiscard]] cache_ptr<T> get_cache_ptr(size_t n) {
-            return cache_ptr<T>(&(this->at(n)), generation);
+            return cache_ptr<T>(&(at(n)), generation);
         }
 
         /**

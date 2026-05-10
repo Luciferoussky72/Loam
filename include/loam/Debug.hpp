@@ -6,22 +6,25 @@
  * @note this header heavily uses reflection; it's therefore heavily commented because many C++ developers are unfamiliar
  * with the concept, and editor tooling has been slow to adopt it- at the time of writing, Clangd is still mostly reflection-blind
  */
+#include <iomanip>
 #include <type_traits>
 #include <iostream>
 #include <meta>
-#include <functional>
+
+#include <loam/Concepts.hpp>
 
 namespace loam {
+
     /**
-     * Uses C++ reflection to log *ANY* class's values; yes, reflection is that powerful!
-     * @note make sure to explicitly cast for polymorphic classes because reflection doesn't implicitly understand polymorphism
+     * Uses C++ reflection to log *ANY* object's values; yes, reflection is that powerful!
+     * @note make sure to explicitly cast for polymorphic objects because reflection can't handle polymorphism
      * @tparam T the type to reflect over and print
      * @param obj the instance to log the values of
      * @param stream the stream to use; defaults to std::clog
      */
     template <typename T>
     requires std::is_aggregate_v<T>
-    void log_class(const T& obj, std::ostream& stream = std::clog) {
+    void log_object(const T& obj, std::ostream& stream = std::clog) {
         //get a static array of all the members in the struct
         static constexpr auto members = std::define_static_array(
             //the ^^ operator is the "reflection operator." it returns special metadata about a type
@@ -31,17 +34,29 @@ namespace loam {
 
         //loop through all the members and print their names and values
         template for (constexpr auto m : members) {
+
+            //get the type of the member to improve the logging
+            using MemberType = [:std::meta::type_of(m):]
+
+            stream << std::meta::identifier_of(m) << ": ";
+
             //enter a recursive call if the class has an instance of another class as its member
-            if constexpr (std::is_aggregate_v<decltype(obj.[:m:])>) {
-                stream << std::meta::identifier_of(m) << ":\n";
+            if constexpr (std::is_aggregate_v<MemberType)>) {
+                stream << '\n';
                 log_class(obj.[:m:], stream);
+            } else if constexpr (std::is_same_v<MemberType, bool>) {
+                stream << obj.[:m:] ? "true" : "false";
+            } else if constexpr (std::is_convertible_v<MemberType, std::string>) {
+                os << '\"' << obj.[:m:] << '\"';
             } else {
                 //the [: :] operator is the "splicer," which basically is the opposite of the reflection operator
                 //it takes some metadata and turns it back into a variable, so you can do things like obj.[:m:],
                 //and it compiles to obj.id, obj.name, etc.
                 //note: I sometimes call it the "carriage operator"
-                stream << std::meta::identifier_of(m) << ": " << obj.[:m:] << '\n';
+                stream << std::meta::identifier_of(m) << ": " << obj.[:m:];
             }
+
+            stream << '\n';
         }
     }
 
