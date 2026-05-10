@@ -5,7 +5,6 @@
 #include <expected>
 
 #include "Engine.hpp"
-#include "Sprite.hpp"
 
 namespace loam {
     /**
@@ -31,6 +30,18 @@ namespace loam {
          * @param path the relative path of the file to the executable's path
          */
         void load_texture(std::string_view name, std::string_view path);
+
+        /**
+         * Unloads an SDL_Texture that the Loader is storing
+         * @param name the name of the texture you'd like to unload
+         */
+        void unload_texture(std::string_view name);
+
+        /**
+         * Unloads ALL SDL_Textures that the Loader holds
+         * @note make sure there are no dangling references to data in the Loader before calling this
+         */
+        void unload_all_textures();
 
         /**
          * Gets an SDL_Texture from the Loader

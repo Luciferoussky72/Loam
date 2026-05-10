@@ -10,17 +10,17 @@ add_library(Loam STATIC
         src/Gamepad.cpp
         src/Loader.cpp
         src/Random.cpp
-        src/Sprite.cpp
+        src/Spritesheet.cpp
         src/Timer.cpp
         src/KeyboardMouse.cpp
-        include/loam/Vec2.hpp
+        src/Vec2.cpp
 )
 
 target_compile_options(Loam PRIVATE
         -std=c++26
         -freflection
         -Wall -Wextra -Wpedantic
-        $<$<CONFIG:Debug>: -O0 -g -Wshadow>
+        $<$<CONFIG:Debug>: -O0 -g>
         $<$<CONFIG:Release>: -O2>
 )
 

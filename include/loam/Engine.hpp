@@ -6,6 +6,7 @@
 namespace loam {
     /**
      * Manages SDL in a clean C++ object
+     * @note including this class's header also gets you SDL3/SDL.h, so it's a good way to get all SDL behaviour
      * @author luciferoussky72
      */
     class Engine {
@@ -20,8 +21,6 @@ namespace loam {
          * @param window_flags flags that the window should use
          */
         Engine(SDL_InitFlags SDL_flags, std::string_view window_title, int window_width, int window_height, SDL_WindowFlags window_flags);
-
-        
 
         Engine(const Engine&) = delete("I don't want you copying Engines and sending programs to Fairy Country!");;
         Engine& operator=(const Engine&) = delete("I don't want you copying Engines with the = operator and sending programs to Fairy Country!");;
@@ -67,7 +66,7 @@ namespace loam {
          * Gets the current window title
          * @return the window title
          */
-        [[nodiscard]] const std::string& get_window_title() const {
+        [[nodiscard]] std::string_view get_window_title() const {
             return window_title;
         }
 
@@ -89,11 +88,11 @@ namespace loam {
 
         /**
          * Changes the window title after instantiating the Engine
-         * @param new_title the new title for the window
+         * @param title the new title for the window
          */
-        void set_window_title(std::string new_title) {
-            SDL_SetWindowTitle(window, new_title.c_str());
-            window_title = std::move(new_title);
+        void set_window_title(std::string title) {
+            SDL_SetWindowTitle(window, title.c_str());
+            window_title = std::move(title);
         }
 
         /**
@@ -104,7 +103,6 @@ namespace loam {
             return renderer;
         }
     private:
-
         std::string window_title;
         SDL_Window* window;
         SDL_Renderer* renderer;

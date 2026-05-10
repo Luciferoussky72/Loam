@@ -14,6 +14,9 @@ although you'll probably appreciate the references more for reading this!
 This describes possible memory bugs that are undefined behavior. It may crash outright or silently corrupt the heap
 and crash randomly elsewhere. Loam documents most-all functions that could cause your program to "enter" The Void of No Return.
 
+Corrupting the heap is especially bad as it usually *doesn't* immediately crash the program. Instead, the program will crash 500 lines 
+later somewhere completely unrelated.
+
 The reference came about because entering The Void of No Return in Hilda means your fate is in peril, which feels like an apt
 way to describe memory bugs in C++
 
