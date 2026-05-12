@@ -1,0 +1,50 @@
+[
+{
+  "directory": "/home/luciferoussky72/Documents/Loam/cmake-build-debug",
+  "command": "/usr/bin/g++-16 -I/home/luciferoussky72/Documents/Loam/include -g -std=gnu++26 -fdiagnostics-color=always -std=c++26 -freflection -Wall -Wextra -Wpedantic -O0 -g -fmodules-ts -fmodule-mapper=CMakeFiles/Loam.dir/src/Engine.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o CMakeFiles/Loam.dir/src/Engine.cpp.o -c /home/luciferoussky72/Documents/Loam/src/Engine.cpp",
+  "file": "/home/luciferoussky72/Documents/Loam/src/Engine.cpp",
+  "output": "/home/luciferoussky72/Documents/Loam/cmake-build-debug/CMakeFiles/Loam.dir/src/Engine.cpp.o"
+},
+{
+  "directory": "/home/luciferoussky72/Documents/Loam/cmake-build-debug",
+  "command": "/usr/bin/g++-16 -I/home/luciferoussky72/Documents/Loam/include -g -std=gnu++26 -fdiagnostics-color=always -std=c++26 -freflection -Wall -Wextra -Wpedantic -O0 -g -fmodules-ts -fmodule-mapper=CMakeFiles/Loam.dir/src/Gamepad.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o CMakeFiles/Loam.dir/src/Gamepad.cpp.o -c /home/luciferoussky72/Documents/Loam/src/Gamepad.cpp",
+  "file": "/home/luciferoussky72/Documents/Loam/src/Gamepad.cpp",
+  "output": "/home/luciferoussky72/Documents/Loam/cmake-build-debug/CMakeFiles/Loam.dir/src/Gamepad.cpp.o"
+},
+{
+  "directory": "/home/luciferoussky72/Documents/Loam/cmake-build-debug",
+  "command": "/usr/bin/g++-16 -I/home/luciferoussky72/Documents/Loam/include -g -std=gnu++26 -fdiagnostics-color=always -std=c++26 -freflection -Wall -Wextra -Wpedantic -O0 -g -fmodules-ts -fmodule-mapper=CMakeFiles/Loam.dir/src/Loader.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o CMakeFiles/Loam.dir/src/Loader.cpp.o -c /home/luciferoussky72/Documents/Loam/src/Loader.cpp",
+  "file": "/home/luciferoussky72/Documents/Loam/src/Loader.cpp",
+  "output": "/home/luciferoussky72/Documents/Loam/cmake-build-debug/CMakeFiles/Loam.dir/src/Loader.cpp.o"
+},
+{
+  "directory": "/home/luciferoussky72/Documents/Loam/cmake-build-debug",
+  "command": "/usr/bin/g++-16 -I/home/luciferoussky72/Documents/Loam/include -g -std=gnu++26 -fdiagnostics-color=always -std=c++26 -freflection -Wall -Wextra -Wpedantic -O0 -g -fmodules-ts -fmodule-mapper=CMakeFiles/Loam.dir/src/Random.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o CMakeFiles/Loam.dir/src/Random.cpp.o -c /home/luciferoussky72/Documents/Loam/src/Random.cpp",
+  "file": "/home/luciferoussky72/Documents/Loam/src/Random.cpp",
+  "output": "/home/luciferoussky72/Documents/Loam/cmake-build-debug/CMakeFiles/Loam.dir/src/Random.cpp.o"
+},
+{
+  "directory": "/home/luciferoussky72/Documents/Loam/cmake-build-debug",
+  "command": "/usr/bin/g++-16 -I/home/luciferoussky72/Documents/Loam/include -g -std=gnu++26 -fdiagnostics-color=always -std=c++26 -freflection -Wall -Wextra -Wpedantic -O0 -g -fmodules-ts -fmodule-mapper=CMakeFiles/Loam.dir/src/Spritesheet.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o CMakeFiles/Loam.dir/src/Spritesheet.cpp.o -c /home/luciferoussky72/Documents/Loam/src/Spritesheet.cpp",
+  "file": "/home/luciferoussky72/Documents/Loam/src/Spritesheet.cpp",
+  "output": "/home/luciferoussky72/Documents/Loam/cmake-build-debug/CMakeFiles/Loam.dir/src/Spritesheet.cpp.o"
+},
+{
+  "directory": "/home/luciferoussky72/Documents/Loam/cmake-build-debug",
+  "command": "/usr/bin/g++-16 -I/home/luciferoussky72/Documents/Loam/include -g -std=gnu++26 -fdiagnostics-color=always -std=c++26 -freflection -Wall -Wextra -Wpedantic -O0 -g -fmodules-ts -fmodule-mapper=CMakeFiles/Loam.dir/src/Timer.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o CMakeFiles/Loam.dir/src/Timer.cpp.o -c /home/luciferoussky72/Documents/Loam/src/Timer.cpp",
+  "file": "/home/luciferoussky72/Documents/Loam/src/Timer.cpp",
+  "output": "/home/luciferoussky72/Documents/Loam/cmake-build-debug/CMakeFiles/Loam.dir/src/Timer.cpp.o"
+},
+{
+  "directory": "/home/luciferoussky72/Documents/Loam/cmake-build-debug",
+  "command": "/usr/bin/g++-16 -I/home/luciferoussky72/Documents/Loam/include -g -std=gnu++26 -fdiagnostics-color=always -std=c++26 -freflection -Wall -Wextra -Wpedantic -O0 -g -fmodules-ts -fmodule-mapper=CMakeFiles/Loam.dir/src/KeyboardMouse.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o CMakeFiles/Loam.dir/src/KeyboardMouse.cpp.o -c /home/luciferoussky72/Documents/Loam/src/KeyboardMouse.cpp",
+  "file": "/home/luciferoussky72/Documents/Loam/src/KeyboardMouse.cpp",
+  "output": "/home/luciferoussky72/Documents/Loam/cmake-build-debug/CMakeFiles/Loam.dir/src/KeyboardMouse.cpp.o"
+},
+{
+  "directory": "/home/luciferoussky72/Documents/Loam/cmake-build-debug",
+  "command": "/usr/bin/g++-16 -I/home/luciferoussky72/Documents/Loam/include -g -std=gnu++26 -fdiagnostics-color=always -std=c++26 -freflection -Wall -Wextra -Wpedantic -O0 -g -fmodules-ts -fmodule-mapper=CMakeFiles/Loam.dir/src/Vec2.cpp.o.modmap -MD -fdeps-format=p1689r5 -x c++ -o CMakeFiles/Loam.dir/src/Vec2.cpp.o -c /home/luciferoussky72/Documents/Loam/src/Vec2.cpp",
+  "file": "/home/luciferoussky72/Documents/Loam/src/Vec2.cpp",
+  "output": "/home/luciferoussky72/Documents/Loam/cmake-build-debug/CMakeFiles/Loam.dir/src/Vec2.cpp.o"
+}
+]

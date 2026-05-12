@@ -4,8 +4,19 @@ project(Loam VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 26)
 
+# Loam relies on SDL3, so it refuses to compile without you having it installed
+find_package(SDL3 QUIET)
+if (NOT SDL3_FOUND)
+    message(FATAL_ERROR "Loam requires SDL3. Get it at https://github.com/libsdl-org/SDL")
+endif()
+
+# Loam uses Python for compile scripts, although it will still compile without it
+find_package(Python3 QUIET COMPONENTS Interpreter)
+if (NOT Python3_FOUND)
+    message(WARNING "Python not found; install Python if you want Loam to automatically handle certain parts of compilation")
+endif()
+
 add_library(Loam STATIC
-        src/loam.cpp
         src/Engine.cpp
         src/Gamepad.cpp
         src/Loader.cpp
@@ -16,6 +27,20 @@ add_library(Loam STATIC
         src/Vec2.cpp
 )
 
+# Any custom compile commands should go here wrap them in if (Python3_FOUND) so CMake can properly sort them out
+if (Python3_FOUND)
+    add_custom_command(
+            TARGET Loam PRE_BUILD
+            COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/compile_scripts/loam_hpp_generator.py
+            COMMENT "Auto-generating loam.hpp"
+    )
+else()
+    message(WARNING "loam.hpp will not be auto-generated. If you've added new headers, run compile_scripts/loam_hpp_generator.py manually")
+endif()
+
+# end custom compile commands
+
+
 target_compile_options(Loam PRIVATE
         -std=c++26
         -freflection
@@ -25,5 +50,4 @@ target_compile_options(Loam PRIVATE
 )
 
 target_include_directories(Loam PUBLIC include/)
-find_package(SDL3 REQUIRED)
 target_link_libraries(Loam PUBLIC SDL3::SDL3)

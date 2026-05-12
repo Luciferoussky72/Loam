@@ -1,0 +1,11 @@
+{
+"rules": [
+{
+"primary-output": "CMakeFiles/Loam.dir/src/Spritesheet.cpp.o",
+"requires": [
+]
+}
+],
+"version": 0,
+"revision": 0
+}

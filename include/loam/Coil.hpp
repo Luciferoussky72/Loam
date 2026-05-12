@@ -7,8 +7,6 @@
 namespace loam {
     /**
      * A special pointer class for safely managing Coil memory
-     * @author luciferoussky72
-     * @tparam T the type of the pointer that the object holds
      */
     template <typename T>
     class coil_ptr;
@@ -22,7 +20,7 @@ namespace loam {
      * A: It's more interesting of a name than "Arena" and gets across how this class differs from a traditional arena
      * @note this object cannot store objects with nontrivial destructors; use other allocators for non-POD types
      */
-    template<size_t coil_ptr_slot_count = 512, bool enable_coil_ptr = true>
+    template<size_t coil_ptr_slot_count = 16, bool enable_coil_ptr = true>
     class Coil {
     public:
         template <typename T>
@@ -49,12 +47,13 @@ namespace loam {
 
         Coil(const Coil&) = delete("Copy constructor deleted because it doesn't make sense to copy a Coil");
         Coil& operator=(const Coil&) = delete("Copying via the = operator is deleted because it doesn't make sense to copy a Coil");
-        Coil(Coil&&) = delete("Moving is deleted because it would invalidate any coil_ptr objects from a Coil");
-        Coil& operator=(Coil&&) = delete("Move assignment is deleted because it would invalidate any coil_ptr objects from a Coil");
+        Coil(Coil&&) = delete("Moving is deleted because it would invalidate any references  to a Coil's data");
+        Coil& operator=(Coil&&) = delete("Move assignment is deleted because it would invalidate any references  to a Coil's data");
 
         /**
          * Allocates memory and returns a typed pointer to it
          * @param bytes the amount of bytes to allocate
+         * @tparam T the type to allocate; must be a trivially destructible type
          * @param alignment the byte count will be rounded to the next highest multiple of this; defaults to 8
          * @return a pointer to start of the allocated block of memory
          */
@@ -70,7 +69,7 @@ namespace loam {
             assert(current_point + bytes < capacity &&
                 "Coil memory overrun. Allocate more to not send your program to The Void of No Return! (may not actually happen)");
 
-            T* tmp = reinterpret_cast<T*>(data + current_point);
+            T* tmp = static_cast<T*>(data + current_point);
             current_point += bytes;
             size_of_last_alloc = bytes;
             last_alloc_was_safe = false;
@@ -79,7 +78,7 @@ namespace loam {
 
         /**
          * Undoes and **invalidates** the last call to alloc or safe_alloc.
-         * @note this only works for the last allocation. any more calls will do nothing
+         * @note this only works for the last allocation; any more calls will do nothing
          */
         void rewind() {
             if (size_of_last_alloc == 0) return;
@@ -96,7 +95,8 @@ namespace loam {
 
         /**
          * Sets the current point of the coil to 0, invalidating all memory allocated with it
-         * @note using memory after freeing it this way is firmly undefined behavior; don't do it unless you want to send your program into The Void of No Return!
+         * @note using memory after freeing it this way is firmly undefined behaviour;
+         * don't do it unless you want to send your program into The Void of No Return!
          */
         void unwind() {
             current_point = 0;

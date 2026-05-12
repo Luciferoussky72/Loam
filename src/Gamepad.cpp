@@ -1,5 +1,7 @@
 #include "loam/Gamepad.hpp"
+
 #include <cmath>
+#include <SDL3/SDL_log.h>
 
 namespace loam {
     [[nodiscard]] std::optional<Gamepad> probe_for_gamepads(const SDL_Event* event) {

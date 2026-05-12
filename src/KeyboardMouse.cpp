@@ -6,7 +6,7 @@
 namespace loam {
     KeyboardMouse::KeyboardMouse() {
         if (keyboard_mouse_instance_exists_please_do_not_make_another_unless_you_want_to_summon_a_time_worm) {
-            SDL_Log("You can't make more than one KeyboardMouse instance.");
+            SDL_Log("You can't make more than one KeyboardMouse instance!");
             std::abort();
         }
         keyboard_mouse_instance_exists_please_do_not_make_another_unless_you_want_to_summon_a_time_worm = true;
