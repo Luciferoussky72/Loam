@@ -22,7 +22,7 @@ add_library(Loam STATIC
         src/Loader.cpp
         src/Random.cpp
         src/Spritesheet.cpp
-        src/Timer.cpp
+        src/Timing.cpp
         src/KeyboardMouse.cpp
         src/Vec2.cpp
         src/Collisions.cpp

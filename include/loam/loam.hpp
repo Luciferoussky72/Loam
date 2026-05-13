@@ -20,5 +20,5 @@ namespace loam {}
 #include <loam/Random.hpp>
 #include <loam/Shapes.hpp>
 #include <loam/Spritesheet.hpp>
-#include <loam/Timer.hpp>
+#include <loam/Timing.hpp>
 #include <loam/Vec2.hpp>

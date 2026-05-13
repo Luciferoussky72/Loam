@@ -10,6 +10,8 @@ namespace loam {
     /**
      * Caches expensive to load objects and SDL assets
      * @note this is the Loam-approved way to cache stuff, but feel free to write your own loader; nothing depends on this
+     * @note also note that this doesn't support hot-reloading inherently, although you could write a hot-reload implementation off of
+     * this using things like std::filesystem::last_write_time and whatnot
      */
     class Loader {
     public:
@@ -36,7 +38,7 @@ namespace loam {
          * @param name the name of the texture you'd like to unload
          */
         void unload_texture(std::string_view name);
-
+        
         /**
          * Unloads ALL SDL_Textures that the Loader holds
          * @note make sure there are no dangling references to data in the Loader before calling this
