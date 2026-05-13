@@ -4,7 +4,7 @@
  * Provides utilities for debugging and testing with Loam
  * @author luciferoussky72
  * @note this header heavily uses reflection; it's therefore heavily commented because many C++ developers are unfamiliar
- * with the concept, and editor tooling has been slow to adopt it- at the time of writing, Clangd is still mostly reflection-blind
+ * with the concept, and editor tooling has been slow to adopt it- at the time of writing, Clang is still mostly reflection-blind
  */
 #include <iomanip>
 #include <type_traits>

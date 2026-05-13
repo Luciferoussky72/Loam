@@ -25,6 +25,8 @@ add_library(Loam STATIC
         src/Timer.cpp
         src/KeyboardMouse.cpp
         src/Vec2.cpp
+        src/Collisions.cpp
+        src/Shapes.cpp
 )
 
 # Any custom compile commands should go here wrap them in if (Python3_FOUND) so CMake can properly sort them out

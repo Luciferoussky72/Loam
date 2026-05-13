@@ -5,10 +5,11 @@
  */
 namespace loam {}
 
-// This header is the "kitchen sink" that just includes all Loam headers.
+// This header is mostly the "kitchen sink" that just includes all Loam headers.
 
 #include <loam/Cache.hpp>
 #include <loam/Coil.hpp>
+#include <loam/Collisions.hpp>
 #include <loam/Concepts.hpp>
 #include <loam/Debug.hpp>
 #include <loam/Engine.hpp>
@@ -17,6 +18,7 @@ namespace loam {}
 #include <loam/Loader.hpp>
 #include <loam/Math.hpp>
 #include <loam/Random.hpp>
+#include <loam/Shapes.hpp>
 #include <loam/Spritesheet.hpp>
 #include <loam/Timer.hpp>
 #include <loam/Vec2.hpp>

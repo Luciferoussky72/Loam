@@ -1,5 +1,10 @@
 #pragma once
 
+/**
+ * Defines various useful concepts used in Loam
+ * @author luciferoussky72
+ */
+
 #include <ostream>
 
 namespace loam {

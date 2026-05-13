@@ -1,9 +1,10 @@
-# Loam Scripting Guidelines
+## Loam Scripting Guidelines
 
 ### Loam is first and foremost a C++ library. Any scripts in Loam should run when the project is built, and should also follow these criteria:
 
 #### 1. Don't do something you can already do with `constexpr` or `consteval`
-If you need to calculate and store values at compile-time, you can already do that in C++ with constexpr or consteval functions
+If you need to calculate and store values, which also includes string literals, at compile-time, you can already do that in C++ 
+with constexpr or consteval functions
 
 #### 2. Make sure it solves a problem and makes things easier
 I'm not the first to say that CMake sucks, so the last thing I want is for people to have to fiddle around with Loam's CMakeLists.txt 
