@@ -1,3 +1,0 @@
-/home/luciferoussky72/Documents/Loam/cmake-build-debug/CMakeFiles/Loam.dir
-/home/luciferoussky72/Documents/Loam/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/luciferoussky72/Documents/Loam/cmake-build-debug/CMakeFiles/rebuild_cache.dir
