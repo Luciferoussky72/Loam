@@ -1,15 +1,16 @@
 #pragma once
 
+
+/**
+ * To avoid just rewriting SDL functionality, here are some useful SDL functions for time management:
+ * SDL_GetTicks() - returns the number of milliseconds since SDL_Init was called. Note that Engine calls SDL_Init in its constructor
+ * SDL_Delay(Uint32 ms) - delays for the specified number of milliseconds
+ * Because this header pulls SDL_timer.h in too, you can use them if you include this header
+ */
+
 #include <SDL3/SDL_timer.h>
 
 namespace loam {
-    /**
-     * To avoid just rewriting SDL functionality, here are some useful SDL functions for time management:
-     * SDL_GetTicks() - returns the number of milliseconds since SDL_Init was called. Note that Engine calls SDL_Init in its constructor
-     * SDL_Delay(Uint32 ms) - delays for the specified number of milliseconds
-     * Because this header pulls SDL_timer.h in too, you can use them if you include this header
-     */
-
     /**
      * Wraps timing intervals with SDL
      * @author luciferoussky72

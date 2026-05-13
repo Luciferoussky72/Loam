@@ -13,8 +13,8 @@ namespace loam {
     }
 
     void Loader::load_texture(std::string_view name, std::string_view path) {
-        auto instance = texture_storage.find(name.data());
-        if (instance != texture_storage.end()) {
+        auto load_check = texture_storage.find(name.data());
+        if (load_check != texture_storage.end()) {
             SDL_Log("Failed to load texture \"%s\"; texture already loaded!", name.data());
             return;
         }
@@ -28,13 +28,13 @@ namespace loam {
     }
 
     void Loader::unload_texture(std::string_view name) {
-        auto it = texture_storage.find(name.data());
-        if (it == texture_storage.end()) {
+        auto load_check = texture_storage.find(name.data());
+        if (load_check == texture_storage.end()) {
             SDL_Log("Failed to unload texture \"%s\"; texture does not exist!", name.data());
             return;
         }
 
-        SDL_DestroyTexture(it->second);
+        SDL_DestroyTexture(load_check->second);
         texture_storage.erase(name.data());
     }
 

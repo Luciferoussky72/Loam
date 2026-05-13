@@ -1,0 +1,57 @@
+#pragma once
+
+#include <unordered_map>
+#include <SDL3_mixer/SDL_mixer.h>
+#include <expected>
+
+namespace loam {
+    /**
+     * Stores the data needed for sounds with SDL
+     * @note this is a trivially copyable type, so feel free to pass it around by value
+     */
+    struct Sound {
+        Uint8* data;
+        Uint32 data_length;
+    };
+
+    /**
+     * Wraps simple audio loading with SDL_mixer
+     * @note this does load sounds for you, but leaves actually playing them up to you, as it feels overly prescriptive to implement that
+     */
+    class AudioLoader {
+    public:
+        /**
+         * Default constructor because there is nothing to do in the constructor
+         */
+        AudioLoader() = default;
+
+        /**
+         * Cleans up the object's Sound objects
+         */
+        ~AudioLoader();
+
+        /**
+         * Loads a new WAV file
+         * @param path the path to the WAV file
+         * @param name the name you want to access the sound with
+         */
+        void load_sound(std::string_view path, std::string_view name);
+
+        /**
+         * Unloads a sound
+         * @param name the sound you want to unload
+         */
+        void unload_sound(std::string_view name);
+
+        /**
+         * Gets a sound
+         * @param name the name of the sound you want
+         * @return an instance of std::expected that either contains the sound or an error message
+         */
+        [[nodiscard]] std::expected<Sound, std::string> get_sound(std::string_view name) const;
+    private:
+        std::unordered_map<std::string, Sound, std::hash<std::string>, std::equal_to<>> sounds;
+    };
+
+
+} // loam
