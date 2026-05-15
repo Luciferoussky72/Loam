@@ -44,6 +44,14 @@ namespace loam {
             delete[] data;
         }
 
+        /**
+         * Checks that a Coil's memory was successfully allocated
+         * @return true if the memory is not nullptr
+         */
+        [[nodiscard]] bool good() const {
+            return data;
+        }
+
 
         Coil(const Coil&) = delete("Copy constructor deleted because it doesn't make sense to copy a Coil");
         Coil& operator=(const Coil&) = delete("Copying via the = operator is deleted because it doesn't make sense to copy a Coil");

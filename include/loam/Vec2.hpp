@@ -129,9 +129,9 @@ namespace loam {
         friend float operator*(const Vec2& a, const Vec2& b);
 
         /**
-         * An implicit conversion to SDL_FPoint for clean SDL interop
+         * A conversion to SDL_FPoint for SDL interop
          */
-        operator SDL_FPoint() const;
+        explicit operator SDL_FPoint() const;
 
         float x = 0;
         float y = 0;

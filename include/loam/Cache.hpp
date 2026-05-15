@@ -13,7 +13,8 @@ namespace loam {
      * Manages a contiguous block of memory on the heap.
      * @author luciferoussky72
      * @note has some key differences from Coil and std::vector, like being fixed-size after creation, able to store only one type,
-     * being able to only grow or be cleared, and having less overhead
+     * being able to only grow or be cleared, and having less overhead. This is kind of like having a Java array, but less of
+     * a pain the neck to use lol
      * @note references and pointers into Cache memory are *guaranteed* to stay valid *until the Cache is cleared*
      * @tparam T the type of variables that the Cache will store
      */

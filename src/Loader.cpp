@@ -1,4 +1,5 @@
 #include "loam/Loader.hpp"
+
 #include <SDL3_image/SDL_image.h>
 
 namespace loam {
@@ -12,30 +13,33 @@ namespace loam {
         }
     }
 
-    void Loader::load_texture(std::string_view name, std::string_view path) {
+    bool Loader::load_texture(std::string_view name, std::string_view path) {
         auto load_check = texture_storage.find(name.data());
         if (load_check != texture_storage.end()) {
             SDL_Log("Failed to load texture \"%s\"; texture already loaded!", name.data());
-            return;
+            return false;
         }
 
         SDL_Texture* tmp = IMG_LoadTexture(engine.get_renderer(), (asset_path + path).c_str());
         if (!tmp) {
             SDL_Log("Failed to load texture \"%s\"; %s", name.data(), SDL_GetError());
-            return;
+            return false;
         }
+
         texture_storage[name.data()] = tmp;
+        return true;
     }
 
-    void Loader::unload_texture(std::string_view name) {
+    bool Loader::unload_texture(std::string_view name) {
         auto load_check = texture_storage.find(name.data());
         if (load_check == texture_storage.end()) {
             SDL_Log("Failed to unload texture \"%s\"; texture does not exist!", name.data());
-            return;
+            return false;
         }
 
         SDL_DestroyTexture(load_check->second);
         texture_storage.erase(name.data());
+        return true;
     }
 
     void Loader::unload_all_textures() {

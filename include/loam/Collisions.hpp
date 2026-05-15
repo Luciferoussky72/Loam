@@ -5,6 +5,7 @@
 namespace loam {
     /**
      * Uses simple bounding boxes to check for collision between two rectangles
+     * @note this is probably the function you want to use most for actual game collisions
      * @param x1 the top-left x coordinate of the first rectangle
      * @param y1 the top-left y coordinate of the first rectangle
      * @param w1 the width of the first rectangle
@@ -19,6 +20,7 @@ namespace loam {
                    float x2, float y2, float w2, float h2);
     /**
      * Overload that accepts SDL_FPoint instead of x and y coordinates for the top-left edges
+     * @note this is probably the function you want to use most for actual game collisions
      * @param p1 defines the top-left x and y coordinates of the first rectangle
      * @param w1 the width of the first rectangle
      * @param h1 the height of the first rectangle
@@ -31,6 +33,7 @@ namespace loam {
                    const SDL_FPoint& p2, float w2, float h2);
     /**
      * Overload that accepts SDL_FRect to define the two rectangles instead
+     * @note this is probably the function you want to use most for actual game collisions
      * @param r1 the first rectangle
      * @param r2 the second rectangle
      * @return whether the two rectangles overlap

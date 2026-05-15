@@ -34,14 +34,16 @@ namespace loam {
          * Loads a new WAV file
          * @param path the path to the WAV file
          * @param name the name you want to access the sound with
+         * @return true on success, false on failure
          */
-        void load_sound(std::string_view path, std::string_view name);
+        [[maybe_unused]] bool load_sound(std::string_view path, std::string_view name);
 
         /**
          * Unloads a sound
          * @param name the sound you want to unload
+         * @return true on success, false on failure
          */
-        void unload_sound(std::string_view name);
+        [[maybe_unused]] bool unload_sound(std::string_view name);
 
         /**
          * Gets a sound

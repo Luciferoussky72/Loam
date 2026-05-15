@@ -22,7 +22,7 @@ namespace loam {
          * @param rows the number of rows the sprite's texture has
          * @param scale the scale at which to size up the sprite; defaults to 1.0f
          */
-        Spritesheet(const Engine& engine, SDL_Texture* texture, uint32_t frames_per_row, uint32_t rows, float scale = 1.0f);
+        Spritesheet(const Engine& engine, SDL_Texture* texture, Uint32 frames_per_row, Uint32 rows, float scale = 1.0f);
 
         /**
          * Draws a Sprite to the screen
@@ -33,7 +33,7 @@ namespace loam {
          * @param flip_x whether to flip the image horizontally; defaults to false
          * @param flip_y whether to flip the image vertically; defaults to false
          */
-        void draw(uint32_t frame, uint32_t row, float x, float y, bool flip_x = false, bool flip_y = false) const;
+        void draw(Uint32 frame, Uint32 row, float x, float y, bool flip_x = false, bool flip_y = false) const;
         /**
          * Overload so you can use Spritesheet with SDL_FPoint
          * @param frame the frame of the spritesheet to draw
@@ -42,7 +42,7 @@ namespace loam {
          * @param flip_x whether to flip the image horizontally; defaults to false
          * @param flip_y whether to flip the image vertically; defaults to false
          */
-        void draw(uint32_t frame, uint32_t row, const SDL_FPoint& position, bool flip_x = false, bool flip_y = false) const;
+        void draw(Uint32 frame, Uint32 row, const SDL_FPoint& position, bool flip_x = false, bool flip_y = false) const;
 
 
     private:
@@ -50,10 +50,10 @@ namespace loam {
         const Engine& engine;
         
         //animation variables
-        uint32_t frame_width;
-        uint32_t frame_height;
-        uint32_t frames_per_row;
-        uint32_t rows;
+        Uint32 frame_width;
+        Uint32 frame_height;
+        Uint32 frames_per_row;
+        Uint32 rows;
 
         float scale;
         SDL_Texture* texture;

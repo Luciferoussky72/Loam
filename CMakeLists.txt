@@ -35,7 +35,7 @@ add_library(Loam STATIC
         src/Audio.cpp
 )
 
-# Any custom compile commands should go here wrap them in if (Python3_FOUND) so CMake can properly sort them out
+# Any custom compile commands should go here; wrap them in if (Python3_FOUND) so CMake can properly sort them out
 if (Python3_FOUND)
     add_custom_command(
             TARGET Loam PRE_BUILD
