@@ -27,7 +27,8 @@ namespace loam {
     void log_object(const T& obj, std::ostream& stream = std::clog) {
         //get a static array of all the members in the struct
         static constexpr auto members = std::define_static_array(
-            //the ^^ operator is the "reflection operator." it returns special metadata about a type
+            //the ^^ operator is the "reflection operator." it returns special metadata about a type that allows your code to know
+            //certain things about itself
             //note: the reflection operator also gets called the "cat-ears operator" and "unibrow operator"
             std::meta::nonstatic_data_members_of(^^T, std::meta::access_context::unchecked())
         );
@@ -36,18 +37,18 @@ namespace loam {
         template for (constexpr auto m : members) {
 
             //get the type of the member to improve the logging
-            using MemberType = [:std::meta::type_of(m):]
+            using member_type = [:std::meta::type_of(m):]
 
             stream << std::meta::identifier_of(m) << ": ";
 
             //enter a recursive call if the class has an instance of another class as its member
-            if constexpr (std::is_aggregate_v<MemberType)>) {
+            if constexpr (std::is_aggregate_v<member_type)>) {
                 stream << '\n';
                 log_class(obj.[:m:], stream);
-            } else if constexpr (std::is_same_v<MemberType, bool>) {
+            } else if constexpr (std::is_same_v<member_type, bool>) {
                 stream << obj.[:m:] ? "true" : "false";
-            } else if constexpr (std::is_convertible_v<MemberType, std::string>) {
-                os << '\"' << obj.[:m:] << '\"';
+            } else if constexpr (std::is_convertible_v<member_type, std::string>) {
+                stream << '\"' << obj.[:m:] << '\"';
             } else {
                 //the [: :] operator is the "splicer," which basically is the opposite of the reflection operator
                 //it takes some metadata and turns it back into a variable, so you can do things like obj.[:m:],
@@ -67,7 +68,7 @@ namespace loam {
      * @return the type name as an instance of std::string view
      */
     template <typename T>
-    constexpr std::string_view type_name() {
+    consteval std::string_view type_name() {
         return std::meta::identifier_of(^^T);
     }
 
@@ -82,8 +83,9 @@ namespace loam {
     constexpr std::string_view enum_to_string(E value) {
         //as this is constexpr, we can simply run a for loop over all members in the enum, looking for our match
         template for (constexpr auto e : std::define_static_array(std::meta::enumerators_of(^^E))) {
-            if (value == [:e:])
+            if (value == [:e:]) {
                 return std::meta::identifier_of(e);
+            }
         }
         return "enum member is lost in Fairy Country. (enum member not found)";
     }
@@ -97,10 +99,10 @@ namespace loam {
      * @param stream the stream to use; defaults to std::clog
      */
     template <typename T, typename F>
-    requires std::is_arithmetic_v<T> && std::invocable<F, T>
+    requires std::is_arithmetic_v<T> and std::invocable<F, T>
     void step_through(F&& function, T start, T stop, T step = static_cast<T>(1), std::ostream& stream = std::clog) {
-        for (T i = start; i <= stop; i += step) {
-            stream << "\nInput: " << i << " Result: " << function(i);
+        for (; start <= stop; start += step) {
+            stream << "\nInput: " << start << " Result: " << function(start);
         }
     }
 } // loam

@@ -1,13 +1,13 @@
 #include "loam/Audio.hpp"
 
 namespace loam {
-    AudioLoader::~AudioLoader() {
+    SoundLoader::~SoundLoader() {
         for (auto& s : sounds) {
             SDL_free(s.second.data);
         }
     }
 
-    bool AudioLoader::load_sound(std::string_view path, std::string_view name) {
+    bool SoundLoader::load_sound(std::string_view path, std::string_view name) {
         auto load_check = sounds.find(name.data());
         if (load_check != sounds.end()) {
             SDL_Log("Failed to load sound \"%s\"; sound already loaded!", name.data());
@@ -25,7 +25,7 @@ namespace loam {
         return true;
     }
 
-    bool AudioLoader::unload_sound(std::string_view name) {
+    bool SoundLoader::unload_sound(std::string_view name) {
         auto load_check = sounds.find(name.data());
         if (load_check == sounds.end()) {
             SDL_Log("Failed to unload sound \"%s\"; sound does not exist!", name.data());
@@ -37,7 +37,7 @@ namespace loam {
         return true;
     }
 
-    std::expected<Sound, std::string> AudioLoader::get_sound(std::string_view name) const {
+    std::expected<Sound, std::string> SoundLoader::get_sound(std::string_view name) const {
         auto load_check = sounds.find(name.data());
         if (load_check == sounds.end()) {
             return std::unexpected(std::string("Sound \"") + name + "\" does not exist!");

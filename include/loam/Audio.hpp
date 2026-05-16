@@ -17,18 +17,19 @@ namespace loam {
     /**
      * Wraps simple audio loading with SDL_mixer
      * @note this does load sounds for you, but leaves actually playing them up to you, as it feels overly prescriptive to implement that
+     * @note this can only load WAV files, although Sound structs can store SDL sound data from any file format
      */
-    class AudioLoader {
+    class SoundLoader {
     public:
         /**
          * Default constructor because there is nothing to do in the constructor
          */
-        AudioLoader() = default;
+        SoundLoader() = default;
 
         /**
          * Cleans up the object's Sound objects
          */
-        ~AudioLoader();
+        ~SoundLoader();
 
         /**
          * Loads a new WAV file

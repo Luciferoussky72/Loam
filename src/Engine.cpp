@@ -1,14 +1,30 @@
 #include "loam/Engine.hpp"
 
 namespace loam {
-    Engine::Engine(SDL_InitFlags SDL_flags, std::string_view window_title, int window_width, int window_height, SDL_WindowFlags window_flags)
-        : window_title(window_title), window_width(window_width), window_height(window_height) {
+    Engine::Engine(SDL_InitFlags SDL_flags, std::string window_title, int window_width, int window_height, SDL_WindowFlags window_flags)
+        : window_width(window_width), window_height(window_height) {
 
-        if (SDL_Init(SDL_flags)) {
-            window = SDL_CreateWindow(window_title.data(), window_width, window_height, window_flags);
-            renderer = SDL_CreateRenderer(window, nullptr);
+        if (!SDL_Init(SDL_flags)) {
+            SDL_Log("Error initializing SDL: %s", SDL_GetError());
+            std::abort();
         }
 
+        window = SDL_CreateWindow(window_title.c_str(), window_width, window_height, window_flags);
+        if (!window) {
+            SDL_Log("Error initializing the window: %s", SDL_GetError());
+            SDL_Quit();
+            std::abort();
+        }
+
+        renderer = SDL_CreateRenderer(window, nullptr);
+        if (!renderer) {
+            SDL_Log("Error initializing the renderer: %s", SDL_GetError());
+            SDL_DestroyWindow(window);
+            SDL_Quit();
+            std::abort();
+        }
+
+        this->window_title = std::move(window_title);
     }
 
     Engine::~Engine() {

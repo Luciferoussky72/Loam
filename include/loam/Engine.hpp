@@ -20,7 +20,7 @@ namespace loam {
          * @param window_height the height of the window
          * @param window_flags flags that the window should use
          */
-        Engine(SDL_InitFlags SDL_flags, std::string_view window_title, int window_width, int window_height, SDL_WindowFlags window_flags);
+        Engine(SDL_InitFlags SDL_flags, std::string window_title, int window_width, int window_height, SDL_WindowFlags window_flags);
 
         Engine(const Engine&) = delete("I don't want you copying Engines and sending programs to Fairy Country!");;
         Engine& operator=(const Engine&) = delete("I don't want you copying Engines with the = operator and sending programs to Fairy Country!");;
