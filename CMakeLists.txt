@@ -34,7 +34,7 @@ add_library(Loam STATIC
         src/Shapes.cpp
         src/Sound.cpp
 
-        # Dear ImGui stuff, as Loam uses Dear ImGui's SDL implementation for debug UI
+        # ImGui stuff, as Loam uses ImGui's SDL implementation for debug UI
         libraries/imgui/imgui.cpp
         libraries/imgui/imgui_draw.cpp
         libraries/imgui/imgui_tables.cpp

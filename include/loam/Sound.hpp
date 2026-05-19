@@ -37,14 +37,14 @@ namespace loam {
          * @param name the name you want to access the sound with
          * @return true on success, false on failure
          */
-        [[maybe_unused]] bool load_sound(std::string_view path, std::string_view name);
+        bool load_sound(std::string_view path, std::string_view name);
 
         /**
          * Unloads a sound
          * @param name the sound you want to unload
          * @return true on success, false on failure
          */
-        [[maybe_unused]] bool unload_sound(std::string_view name);
+        bool unload_sound(std::string_view name);
 
         /**
          * Gets a sound

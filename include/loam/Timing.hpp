@@ -40,17 +40,6 @@ namespace loam {
         [[nodiscard]] float delta_time_s() const;
 
         /**
-         * Gets the difference in time (in milliseconds) between the last call to start and stop
-         * @note returns useless values until you have a proper start and stop pair
-         */
-        explicit operator Uint64() const;
-        /**
-         * Gets the difference in time (in seconds) between the last call to start and stop
-         * @note returns useless values until you have a proper start and stop pair
-         */
-        explicit operator float() const;
-
-        /**
          * @return the time in milliseconds when you last called start()
          */
         [[nodiscard]] Uint64 get_start_time() const;

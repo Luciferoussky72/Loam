@@ -17,13 +17,6 @@ namespace loam {
         return static_cast<float>(delta_ms)/1000.0f;
     }
 
-    Timer::operator Uint64() const {
-        return delta_ms;
-    }
-    Timer::operator float() const {
-        return static_cast<float>(delta_ms)/1000.0f;
-    }
-
     Uint64 Timer::get_start_time() const {
         return start_time;
     }

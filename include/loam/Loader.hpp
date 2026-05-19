@@ -32,14 +32,14 @@ namespace loam {
          * @param path the relative path of the file to the executable's path
          * @return true on success, false on failure
          */
-        [[maybe_unused]] bool load_texture(std::string_view name, std::string_view path);
+        bool load_texture(std::string_view name, std::string_view path);
 
         /**
          * Unloads an SDL_Texture that the Loader is storing
          * @param name the name of the texture you'd like to unload
          * @return true on success, false on failure
          */
-        [[maybe_unused]] bool unload_texture(std::string_view name);
+        bool unload_texture(std::string_view name);
         
         /**
          * Unloads ALL SDL_Textures that the Loader holds
