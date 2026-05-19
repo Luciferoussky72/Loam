@@ -1,4 +1,4 @@
-#include "loam/Audio.hpp"
+#include "loam/Sound.hpp"
 
 namespace loam {
     SoundLoader::~SoundLoader() {

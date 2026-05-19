@@ -10,8 +10,7 @@
 #include <type_traits>
 #include <iostream>
 #include <meta>
-
-#include <loam/Concepts.hpp>
+#include "imgui.h"
 
 namespace loam {
 
@@ -39,48 +38,44 @@ namespace loam {
             //get the type of the member to improve the logging
             using member_type = [:std::meta::type_of(m):]
 
-            stream << std::meta::identifier_of(m) << ": ";
+            std::print(stream, "{}: ", std::meta::identifier_of(m));
 
             //enter a recursive call if the class has an instance of another class as its member
             if constexpr (std::is_aggregate_v<member_type)>) {
-                stream << '\n';
-                log_class(obj.[:m:], stream);
-            } else if constexpr (std::is_same_v<member_type, bool>) {
-                stream << obj.[:m:] ? "true" : "false";
+                std::print(stream, "\n");
+                log_object(obj.[:m:], stream);
             } else if constexpr (std::is_convertible_v<member_type, std::string>) {
-                stream << '\"' << obj.[:m:] << '\"';
+                std::print(stream, "\"{}\"\n", obj.[:m:]);
             } else {
                 //the [: :] operator is the "splicer," which basically is the opposite of the reflection operator
                 //it takes some metadata and turns it back into a variable, so you can do things like obj.[:m:],
                 //and it compiles to obj.id, obj.name, etc.
                 //note: I sometimes call it the "carriage operator"
-                stream << std::meta::identifier_of(m) << ": " << obj.[:m:];
+                std::print(stream, "{}\n", obj.[:m:]);
             }
-
-            stream << '\n';
         }
     }
 
     /**
-     * Gets the name of a type using reflection
+     * Gets the name of a type as a string using reflection
      * @note reflection really is a game-changer for stuff like this as before you'd have to use macros for this
      * @tparam T the type name to get
      * @return the type name as an instance of std::string view
      */
     template <typename T>
-    consteval std::string_view type_name() {
+    consteval std::string_view type_name(T var) {
         return std::meta::identifier_of(^^T);
     }
 
     /**
-     * Converts an enum identifier to a string
+     * Gets an enum identifier as a string
      * @tparam E the enum or enum class the enum value belongs to
      * @param value the value within the enum that you want as a string
      * @return returns just the enumerator name, e.g. "East" rather than "Directions::East"
      */
     template<typename E>
     requires std::is_enum_v<E>
-    constexpr std::string_view enum_to_string(E value) {
+    constexpr std::string_view string_from_enum(E value) {
         //as this is constexpr, we can simply run a for loop over all members in the enum, looking for our match
         template for (constexpr auto e : std::define_static_array(std::meta::enumerators_of(^^E))) {
             if (value == [:e:]) {
@@ -102,7 +97,40 @@ namespace loam {
     requires std::is_arithmetic_v<T> and std::invocable<F, T>
     void step_through(F&& function, T start, T stop, T step = static_cast<T>(1), std::ostream& stream = std::clog) {
         for (; start <= stop; start += step) {
-            stream << "\nInput: " << start << " Result: " << function(start);
+            std::print(stream, "Input: {} Result: {}\n", start, function(start));
         }
+    }
+
+    /**
+     * Pushes debug UI for a class instance to a new ImGui window
+     * @tparam T the type to log
+     * @param instance the instance of T to log
+     * @return true on success, false on failure
+     */
+    template <typename T>
+    requires std::is_aggregate_v<T>
+    bool generate_class_debug_ui(const T& instance) {
+        ImGui::Begin(std::meta::identifier_of(^^T));
+
+        static constexpr auto members = std::define_static_array(
+            std::meta::nonstatic_data_members_of(^^T, std::meta::access_context::unchecked())
+        );
+
+        template for (constexpr auto m : members) {
+            std::stringstream text;
+            using member_type = [:std::meta::type_of(m):]
+
+            if constexpr (std::is_convertible_v<member_type, std::string>) {
+                std::print(text, "{}: \"{}\"", std::meta::identifier_of(m), instance.[:m:]);
+            } else {
+                std::print(text, "{}: {}", std::meta::identifier_of(m), instance.[:m:]);
+            }
+
+            ImGui::Text(text.str().c_str());
+        }
+
+        ImGui::End();
+
+        return true;
     }
 } // loam
