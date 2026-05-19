@@ -1,8 +1,8 @@
 ## Auto-generates loam.hpp when you compile Loam
 # @author luciferoussky72
 
-#note that if you're using CLion, the IDE's static analyzer might not pick up on Python modules, but Loam should still compile so long
-#as Python is installed on your system.
+# note that if you're using CLion, the IDE's static analyzer might not pick up on Python modules, but Loam should still compile so long
+# as Python is installed on your system.
 
 # Yes, I use semicolons in writing Python code. It's too much of a habit to break it
 # -luciferoussky72

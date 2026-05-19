@@ -87,8 +87,8 @@ Why "The Four Yorkshiremen?" It's a reference to a Monty Python sketch:
 
 "You were lucky. We lived for three months in a brown paper bag in a septic tank.
 We used to have to get up at six o'clock in the morning, clean the bag, eat a crust of stale
-bread, go to work down the mill for fourteen hours a day week in week out. When we
-got home, out Dad would thrash us to sleep with his belt!"
+bread, go to work down the mill for fourteen hours a day; week in, week out. When we
+got home, our Dad would thrash us to sleep with his belt!"
 
 Rewritten the perspective of a C++ developer:
 

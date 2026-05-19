@@ -145,11 +145,11 @@ namespace loam {
  */
 template <>
 struct std::formatter<loam::Vec2> {
-    constexpr static auto parse(const std::format_parse_context& ctx) {
-        return ctx.begin();
+    constexpr static auto parse(const std::format_parse_context& context) {
+        return context.begin();
     }
 
-    auto format(const loam::Vec2& v, std::format_context& ctx) const {
-        return std::format_to(ctx.out(), "{}{}, {}{}", loam::Vec2::VEC_FORMAT_LEFT, v.x, v.y, loam::Vec2::VEC_FORMAT_RIGHT);
+    auto format(const loam::Vec2& vec2, std::format_context& context) const {
+        return std::format_to(context.out(), "{}{}, {}{}", loam::Vec2::VEC_FORMAT_LEFT, vec2.x, vec2.y, loam::Vec2::VEC_FORMAT_RIGHT);
     }
 };

@@ -32,10 +32,20 @@ add_library(Loam STATIC
         src/Vec2.cpp
         src/Collisions.cpp
         src/Shapes.cpp
-        src/Audio.cpp
+        src/Sound.cpp
+
+        # Dear ImGui stuff, as Loam uses Dear ImGui's SDL implementation for debug UI
+        libraries/imgui/imgui.cpp
+        libraries/imgui/imgui_draw.cpp
+        libraries/imgui/imgui_tables.cpp
+        libraries/imgui/imgui_widgets.cpp
+        libraries/imgui/imgui_demo.cpp
+        libraries/imgui/backends/imgui_impl_sdl3.cpp
+        libraries/imgui/backends/imgui_impl_sdlgpu3.cpp
 )
 
-# Any custom compile commands should go here; wrap them in if (Python3_FOUND) so CMake can properly sort them out
+
+# Any custom compile commands should go here; be sure to add warnings for each command for if Python wasn't found
 if (Python3_FOUND)
     add_custom_command(
             TARGET Loam PRE_BUILD
@@ -58,4 +68,6 @@ target_compile_options(Loam PRIVATE
 )
 
 target_include_directories(Loam PUBLIC include/)
+target_include_directories(Loam PUBLIC "libraries/imgui/")
+target_include_directories(Loam PUBLIC "libraries/imgui/backends/")
 target_link_libraries(Loam PUBLIC SDL3::SDL3 SDL3_mixer::SDL3_mixer)

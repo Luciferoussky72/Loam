@@ -7,7 +7,6 @@ namespace loam {}
 
 // This header is mostly the "kitchen sink" that just includes all Loam headers.
 
-#include <loam/Audio.hpp>
 #include <loam/Cache.hpp>
 #include <loam/Coil.hpp>
 #include <loam/Collisions.hpp>
@@ -20,6 +19,7 @@ namespace loam {}
 #include <loam/Math.hpp>
 #include <loam/Random.hpp>
 #include <loam/Shapes.hpp>
+#include <loam/Sound.hpp>
 #include <loam/Spritesheet.hpp>
 #include <loam/Timing.hpp>
 #include <loam/Vec2.hpp>
