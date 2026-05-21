@@ -15,6 +15,7 @@ namespace loam {}
 #include <loam/Engine.hpp>
 #include <loam/Gamepad.hpp>
 #include <loam/KeyboardMouse.hpp>
+#include <loam/Lifetimes.hpp>
 #include <loam/Loader.hpp>
 #include <loam/Math.hpp>
 #include <loam/Random.hpp>

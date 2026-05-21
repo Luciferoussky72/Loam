@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <SDL3_mixer/SDL_mixer.h>
 #include <expected>
+#include <string>
 
 namespace loam {
     /**

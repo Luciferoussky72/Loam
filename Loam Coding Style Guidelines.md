@@ -190,18 +190,23 @@ There is... quite literally no reason to pass values like this. You can get the 
 Because this also breaks the established Call-Site-Clarity conventions, passing by constant pointer is banned in Loam. Never do it.
 
 
-### 4. Prefer stack and Coil-allocated memory over heap memory where possible
+### 4. Prefer stack and custom-allocated memory over heap memory where possible
 
-Heap memory is slow to allocate and slow to free. That's a problem in gamedev, where you often need to hit tight frametimes. For that reason, Loam uses stack or Coil memory where possible to keep things fast.
+Heap memory is slow to allocate and slow to free. That's a problem in gamedev, where you often need to hit tight frametimes. 
+For that reason, Loam uses stack memory or memory from custom allocators where possible to keep things fast.
 
-###### Note: A Coil is a special class in Loam that works like a memory arena but with some extra features. Read Coil.hpp if you're curious about it
+###### Note: Loam's current custom allocators include:
+###### Cache - A fixed-size heap array wrapper
+###### Coil - A memory allocator for trivially destructible types
 
-Both the stack and Coils allocate memory by simply moving a pointer. The heap has to talk to the OS to allocate memory, making it far slower.
+Both the stack and most custom allocators allocate memory by simply moving a pointer. 
+The heap has to talk to the OS to allocate memory, making it orders of magnitude slower.
 
-###### "But wait, don't most objects have to use heap allocations in their constructors? Coil literally allocates heap memory in its constructor!"
+###### "But wait, don't most objects have to use heap allocations in their constructors? Coil and Cache literally allocate heap memory in their constructors!"
 
-Yes, but a good sign you're being responsible with the heap is if the only new and delete calls are in object constructors. Not only does this make your code more memory-safe, it makes heap
-allocation pauses easier to reason about, as an object being constructed basically says "hey, the program may lag here because we're allocating heap memory"
+Yes, but a good sign you're being responsible with the heap is if the only new and delete calls are in object constructors. 
+Not only does this make your code more memory-safe, it makes heap allocation pauses easier to reason about, as an object, especially a memory 
+allocator, being constructed basically says "hey, the program may lag here because we're allocating heap memory!"
 
 Also, ideally you should load textures and other things into dynamic memory when your program starts. 
 This keeps frame times predictable for the rest of your program, as, well, with no more heap allocations needed, 

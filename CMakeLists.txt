@@ -42,6 +42,7 @@ add_library(Loam STATIC
         libraries/imgui/imgui_demo.cpp
         libraries/imgui/backends/imgui_impl_sdl3.cpp
         libraries/imgui/backends/imgui_impl_sdlgpu3.cpp
+        include/loam/Lifetimes.hpp
 )
 
 
@@ -62,7 +63,8 @@ endif()
 target_compile_options(Loam PRIVATE
         -std=c++26
         -freflection
-        -Wall -Wextra -Wpedantic
+        -fno-exceptions
+        -Wall -Wextra -Wpedantic -Werror
         $<$<CONFIG:Debug>: -O0 -g>
         $<$<CONFIG:Release>: -O2>
 )

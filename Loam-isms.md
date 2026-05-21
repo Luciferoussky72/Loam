@@ -26,12 +26,12 @@ This describes instability ***not*** caused by memory bugs, like invalidating re
 It's above things like loam::random_device, and basically means that you shouldn't mess with the data it's describing.
 
 While Fairy Country style instability is similar to Void of No Return instability in that it might work for a while,
-the difference is that "Void of No Return" describes pointer and memory issues while "Fairy Country" describes things like 
+the difference is that "The Void of No Return" describes pointer and memory issues while "Fairy Country" describes things like 
 hanging references, corrupted data, etc.
 
 In Hilda, Fairy Country is a place where little makes sense. Terrain floats; mushrooms grow as tall as buildings; the sun never sets. 
 Because of that, it's a fitting way to describe errors caused by non-memory issues, as often you end up with a mind-boggling error 
-message for Fairy Country issues
+message for Fairy Country issues or the program doesn't work as intended in some ridiculous way
 
 #### "Nowhere Space" and anything involving "nisse"
 This is used to describe possible memory leaks you could cause and should be careful about. While Loam is mostly memory-safe by 
@@ -39,7 +39,7 @@ design, there are still occasional situations where it's reasonable that somebod
 language describes memory leaks.
 
 "Nowhere Space" in Hilda is a special sort of space that a creature called a "nisse" (look up the IPA to pronounce it correctly) can enter.
-It is a manifestation of the unused space in a building, so it actually works rather well as a metaphor for how a memory leak happens. 
+It's a manifestation of the unused space in a building, so it actually works rather well as a metaphor for how a memory leak happens. 
 You'll see fairly often in Loam comments that a memory leak will lead to a "nisse taking the memory," which is honestly rather accurate. 
 Nisse in Hilda take things that they see people are no longer using, and hey, it's a fun scene to imagine someone lives in your RAM and
 takes the memory lost to memory leaks.

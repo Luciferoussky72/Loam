@@ -184,7 +184,7 @@ namespace loam {
          * @note memory-unsafe, obviously, as the raw pointer could be invalidated
          * @return the internal raw pointer
          */
-        [[nodiscard]] T* get() {
+        [[nodiscard]] T* unsafe_get() {
             return raw_ptr;
         }
 
