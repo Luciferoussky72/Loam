@@ -6,6 +6,13 @@
  * @note this header heavily uses reflection; it's therefore heavily commented because many C++ developers are unfamiliar
  * with the concept, and editor tooling has been slow to adopt it- at the time of writing, Clang is still mostly reflection-blind
  */
+
+/**
+ * Controls whether this header defines macros or not
+ * @note undefining or commenting out this macro will make it so all of this header's macros are undefined
+ */
+#define LOAM_DEFINE_DEBUG_MACROS
+
 #include <iomanip>
 #include <type_traits>
 #include <iostream>
@@ -36,12 +43,12 @@ namespace loam {
         template for (constexpr auto m : members) {
 
             //get the type of the member to improve the logging
-            using member_type = [:std::meta::type_of(m):]
+            using member_type = [:std::meta::type_of(m):];
 
             std::print(stream, "{}: ", std::meta::identifier_of(m));
 
             //enter a recursive call if the class has an instance of another class as its member
-            if constexpr (std::is_aggregate_v<member_type)>) {
+            if constexpr (std::is_aggregate_v<member_type>) {
                 std::print(stream, "\n");
                 log_object(obj.[:m:], stream);
             } else if constexpr (std::is_convertible_v<member_type, std::string>) {
@@ -134,3 +141,4 @@ namespace loam {
         return true;
     }
 } // loam
+

@@ -30,12 +30,12 @@ And yet still other people write them like this, with no space after the closing
 The one place it actually does matter is when you have a production library or codebase where consistency is more valuable.
 Thankfully, **that's the kind of problem you can solve in about five minutes with a text-replace tool**.
 
-Long-story-short, don't wage wars over petty style differences. Whether it's The One True Brace Style or something like
-how to declare pointers; arguing with people over style differences that are really just personal preference is a waste of time.
+Long-story-short, **don't wage wars over petty style differences**. Whether it's The One True Brace Style or something like
+how to declare pointers; **arguing with people over style differences that are really just personal preference is a waste of time**.
 
 ### 2. That said, if you're style-agnostic, here are the petty style conventions in Loam:
 
-#### Note that as Loam is mostly developed by me (luciferoussky72), these are reflective of my personal style conventions
+#### Note that as Loam is (at the time of writing) mostly developed by me (luciferoussky72), these are reflective of my personal style conventions
 
 ##### Curly braces should be on the same line as the statement they're associated with:
 ```c++
@@ -44,7 +44,7 @@ if (true) {
 }
 ```
 
-##### Put a space after if, while, for, and do, and no space after function names:
+##### Put a space after if, while, for, do, and requires (in concept definitions), and no space after function names:
 ```c++
 while (x <= 10) x++;
 x = func(x);
@@ -64,7 +64,7 @@ int* x, y;
 Here, x is a pointer-to-int while y is just a normal int. That said, I see this as more of a pro than a con. I 
 dislike multiple declarations on one line, and this helps discourage them
 
-##### Avoid multiple declarations on one line:
+##### Speaking of... avoid multiple declarations on one line:
 ```c++
 int x = 50;
 int y = 100;
@@ -87,68 +87,89 @@ private:
 
 ### 3. Passing conventions are the weird hill I die on
 
-Okay, maybe it's not a super weird hill, but this is still something I'm very insistent about. 
+Okay, maybe it's not a super weird hill, but this is still something I'm very insistent about.
 
-Basically, C++ gives you a lot of ways to pass variables to functions; which is great, I'm not denying that, but I have some pretty strict ground rules about how to use each, and Loam uses only four of them:
+Basically, C++ gives you a lot of ways to pass variables to functions; which is great, I'm not denying that, but I have some pretty strict ground 
+rules about how to use each, and Loam uses only four of them:
 
 ##### Passing by value:
 ```c++
-    //this is the syntax for passing by value
+    //syntax for passing by value
     void func(int x);
 ```
-This should be used where the function needs simply to read data from, or a local copy of the variable. It doesn't necessarily need to change the variable for a pass-by-value to be valid.
+This should be used where the function needs simply to read data from, or a local copy of the variable. It doesn't necessarily need to change the variable 
+for a pass-by-value to be valid.
 
-You should pass by value when the variable is less than 8-16 bytes in size. At that point, passing by constant reference becomes a better option unless it's useful or required to have a local copy of the variable
-in the function.
+You should pass by value when the variable is less than 8-16 bytes in size. At that point, passing by constant reference becomes a better option unless it's
+useful or required to have a local copy of the variable in the function.
 
 ##### Passing by constant value (don't do this):
 ```c++
-    //this is the syntax for passing by constant value
+    //syntax for passing by constant value
     void func(const int x);
 ```
 
-I hate this method of passing variables. It literally does nothing useful. When a variable is passed by value, constant or not, the function already gets a local copy of the variable, so making the variable constant
-in the function signature literally just means that the function cannot modify its local copy.
+I hate this method of passing variables. It literally does nothing useful. When a variable is passed by value, constant or not, the function already gets a local
+copy of the variable, so making the variable constant in the function signature literally just means that the function cannot modify its local copy.
 
-**Loam never uses this syntax. You shouldn't either.**
+**Loam never uses this syntax. You shouldn't either.** (the const-correctness people are squirming now)
 
 ##### Passing by **constant** reference:
 ```c++
-    //this is the syntax for passing by constant reference
+    //syntax for passing by constant reference
     void func(const int& x);
 ```
 
-This should be used when the variable is more than 8-16 bytes in size **AND** function doesn't need a local copy of the variable, just to read data from it.
+This should be used when the variable is more than 8-16 bytes in size **AND** function doesn't need a local copy of the variable; just to read data from it.
 
 Do note that in the case of passing objects by constant reference, a method must be marked const to be callable via the constant reference:
 ```c++
-    //this is the syntax for declaring a method as const
-    int get_value() const;
+    //syntax for declaring/defining a method as const
+    int get_value() const {
+        //the body of the function cannot change internal state
+        return value
+    };
 ```
 
 ##### Passing by pointer:
 ```c++
-    //this is the syntax for passing by pointer
+    //syntax for passing by pointer
     void func(int* x);
 ```
 
-Passing by pointer should be done when your function modifies the variable passed to it. This is a convention observed throughout Loam to make code easier to read.
+Passing by pointer should be done when your function modifies the variable passed to it. This is a convention observed throughout Loam to make data flow 
+easier to reason about.
+
+Note that if you're using a pointer to make a value optional; you should use a default parameter to make it nullptr by default. This saves users from having to 
+always spell out "nullptr" when calling the function:
+```c++
+    //bad
+    Spool<Gamepad> get_gamepads(int* num_gamepads);
+    //usage
+    auto gamepads = get_gamepads(nullptr);
+
+    //good
+    Spool<Gamepad> get_gamepads(int* num_gamepads = nullptr);
+    //usage
+    auto gamepads = get_gamepads();
+```
 
 I elaborate more as to why this is the case when I talk about passing by mutable reference, so read that if you want to understand why this is the convention.
 
 ###### Always remember to check for nullptr! 
-###### Also, fun fact: C++ compilers are usually smart enough to optimize out checks for nullptr, so there is no reason to not check
+###### Also, fun fact: C++ compilers are usually smart enough to optimize out checks for nullptr where they can, so there is no reason to not check
 
-##### Passing by **nonconstant/mutable** reference (you should only do this in very specific situations):
+##### Passing by **nonconstant/mutable** reference (you should only do this in specific situations):
 ```c++
-    //this is the syntax for passing by nonconstant/mutable reference
+    //syntax for passing by nonconstant/mutable reference
     void func(int& x);
 ```
 
-Unlike passing by value, passing by mutable reference means the function gets to modify the original copy of the variable passed to it. Plus, unlike passing by pointer, there's no address-of operator needed! 
-Sounds pretty great! 
+Unlike passing by value, passing by mutable reference means the function gets to modify the original copy of the variable passed to it. Plus, unlike passing by 
+pointer, there's no address-of operator needed! Sounds pretty great! 
 
-Unfortunately, while passing by mutable reference has its uses, I think avoiding it in most situations is a very helpful style choice. There's a pretty simple reason for that:
+Unfortunately, while passing by mutable reference has its uses, I think avoiding it in most situations is a very helpful style choice. 
+There's a pretty simple reason for that:
 
 ###### **Call-Site-Clarity**
 
@@ -170,24 +191,68 @@ Solution? Passing by mutable reference is banned outside of one exception:
     friend std::ostream& operator<<(std::ostream& os, const Foo& foo);
 ```
 
-Operator overloads are made to be ergonomic, and using pointers flies in the face of that, so you're free to use mutable references on an as-needed basis in operator overloads. 
-Still use constant references where you can in operator overloads though.
+Operator overloads are made to be ergonomic, and using pointers flies in the face of that, so you're free to use mutable references on an as-needed basis 
+in operator overloads. Still use constant references where you can in operator overloads though.
 
 ###### "But I understand code even when it uses mutable references!"
 
-Okay. Cry me a river. Loam does not use mutable references outside of operator overloads. If you don't like the convention, you can always edit your copy of the source code.
+Okay. Cry me a river. Loam does not use mutable references outside of operator overloads. If you don't like the convention, you can always edit your copy of the
+source code.
+
 That said, I must highlight that Google's C++ style guide actually has this same convention, so this isn't by any means some esoteric convention exclusive to Loam.
 
 
-##### Passing by **constant** pointer (don't do this ever):
+##### Passing by **constant** pointer (don't do this in Loam):
 ```c++
-    //this is the syntax for passing by constant pointer
+    //syntax for passing by constant pointer
     void func(const int* x);
 ```
 
-There is... quite literally no reason to pass values like this. You can get the same effect by just passing by constant reference, and that won't require the address-of operator.
+There is little reason to pass values like this. You can get the same effect by just passing by constant reference, 
+and that won't require the address-of operator.
 
-Because this also breaks the established Call-Site-Clarity conventions, passing by constant pointer is banned in Loam. Never do it.
+Because this also breaks the established Call-Site-Clarity conventions, passing by constant pointer is banned in Loam.
+
+"But wait!" I hear you say; "What if I need to have a parameter that's immutable AND optional? You can't do that without const pointers!"
+
+Actually, you can (well, 90% of the time).
+
+##### Views!
+
+You see, C++ has these things called views; and they're the modern, idiomatic way to pass in a lot of things. You have std::string_view for strings, 
+std::span for arrays and vectors, plus the std::views library that lets you make views of pretty much any type that supports iterators.
+
+The other cool thing about C++ STL containers and views is that most-all of them have a .empty method that checks if the container or view actually contains
+anything.
+
+So think about... we have containers that can optionally contain things... what would you use it for?
+
+That's right! Optional parameters!
+
+You can even use default parameters that represent "empty" with them!
+```c++
+    auto generic_function_name(std::string_view view = "", std::span<int> span = {});
+```
+
+Now, this isn't a perfect solution because views don't cover all objects, but that does let you cover containers and strings.
+
+Thing is, we have two other tricks up our sleeve:
+
+##### 1. std::optional
+
+std::optional is perfect for this most of the time! (I mean, it's right there in the name)
+
+You can even use a default parameter with std::optional too!
+```c++
+    //std::nullopt means the object has no value
+    int do_math(std::optional<int> n = std::nullopt);
+```
+
+The one catch with std::optional is that it can't store a reference; you're forced to copy the object if you want to not effectively pass by pointer anyway.
+
+##### 2. Give your object a way to be passed in optionally
+
+While this doesn't apply for all objects; if it's a custom string or container type, it should have a .empty function! STL containers do after all!
 
 
 ### 4. Prefer stack and custom-allocated memory over heap memory where possible
@@ -196,13 +261,13 @@ Heap memory is slow to allocate and slow to free. That's a problem in gamedev, w
 For that reason, Loam uses stack memory or memory from custom allocators where possible to keep things fast.
 
 ###### Note: Loam's current custom allocators include:
-###### Cache - A fixed-size heap array wrapper
+###### Spool - A fixed-size heap array wrapper
 ###### Coil - A memory allocator for trivially destructible types
 
 Both the stack and most custom allocators allocate memory by simply moving a pointer. 
 The heap has to talk to the OS to allocate memory, making it orders of magnitude slower.
 
-###### "But wait, don't most objects have to use heap allocations in their constructors? Coil and Cache literally allocate heap memory in their constructors!"
+###### "But wait, don't most objects have to use heap allocations in their constructors? Coil and Spool literally allocate heap memory in their constructors!"
 
 Yes, but a good sign you're being responsible with the heap is if the only new and delete calls are in object constructors. 
 Not only does this make your code more memory-safe, it makes heap allocation pauses easier to reason about, as an object, especially a memory 
@@ -215,7 +280,7 @@ there won't be more pauses from heap allocations!
 ### 5. Error handling
 
 The first and foremost rule of error handling in Loam is to ***never use exceptions***; in fact, Loam is compiled with -fno-exceptions, 
-so you have to use other methods of handling errors.
+so you *have* to use other methods of handling errors.
 
 Now, you may ask, "why?" (The great part about writing documentation is that I can put words in your mouth and you can't stop me, muahaha!)
 
@@ -344,7 +409,7 @@ like texture loading, file IO, etc.
 This is basically an error object built into C++'s type system, and probably one of my favorite modern C++ features. It basically means 
 "this function should probably return properly, but it might error, so be ready for that." 
 
-The nice thing about std::expected is that it's kind of like boolean return values but for return values. It forces whatever called your 
+The nice thing about std::expected is that it's kind of like boolean return values but for normal return values. It forces whatever called your 
 function to account for the fact that the function might fail.
 
 ##### 4. assert
@@ -356,5 +421,90 @@ like out-of-range on containers because that is really something that should nev
 The other great thing about assert is that it goes away entirely in release builds, which is especially great for gamedev where you need 
 code that runs *fast*.
 
-## This file is likely to change as Loam and my own personal coding style evolve. For now though, this covers 90% of the coding conventions that come up on a day-to-day basis in Loam
+
+### 6. Naming conventions
+
+In a library context, function names are far more important than variable names. If you think about it, Loam doesn't have many globals at all, and most of them are 
+named something simple like loam::random_device or something silly like keyboard_mouse_instance_exists_please_do_not_make_another_unless_you_want_to_summon_a_time_worm
+(yes, that is an actual variable in KeyboardMouse.hpp).
+
+##### Anyway, let's get the case conventions out of the way first:
+
+##### 1. snake_case for variables, functions, concepts, templates, function parameters, and a few other things
+
+Long story short; snake_case is idiomatic C++. It's what the STL uses and just most common to see in C++ for most things.
+
+Loam does have a few special exceptions:
+
+###### 1. Concepts use both snake_case and PascalCase.
+
+Loam concepts usually come in two "flavors," one that's snake_case and follows the format of "is_blank" and another that's PascalCase that follows 
+the format of "Blank"
+
+###### 2. Template names can be things other than snake_case. 
+
+If a template represents something generic and simple like any type or enum type, just use T and E respectively. Keeps things concise.
+
+If a template represents a non-bool constant like the capacity of a fixed-size container, use SCREAMING_SNAKE_CASE instead.
+
+##### 2. PascalCase for class, union, and struct names
+
+I don't think this needs an explanation really; PascalCase for object type names is idiomatic C++.
+
+The one exception is "companion" classes. Things like iterators, handles, and pointers catered to a specific class should use snake_case instead.
+
+##### 3. SCREAMING_SNAKE_CASE for macros
+
+This is convention and makes it immediately obvious that macros are macros.
+
+##### Alright, now for actual naming conventions.
+
+##### 1. Variables
+
+Make sure a name is just descriptive enough to get the context across. Most of this is common sense, really. Also, try not to be overly descriptive. "i" is fine
+while "index" is visual clutter.
+
+Loam also has some conventions for generic variable names that get used for simple variables passed to functions or in for-each loops:
+
+1. n -> generic number or container index
+2. c -> generic char
+3. s or str -> generic string
+4. view -> generic string_view
+5. span -> generic span
+6. i, j, k, l -> counters (in alphabetical order, although if you go beyond l you may need to question your life choices)
+7. obj -> generic object
+8. raw_ptr -> commonly the name of the member storing the pointer in custom pointer types
+9. lowercase first letter of the type name -> generic object (for example, "const Circle& c")
+10. t -> generic type variable in concepts
+11. os -> generic output stream reference
+12. a, b, c, etc. -> convention for functions and operator overloads that take a few parameters that make sense to represent simply
+13. min & max -> represent the minimum and maximum of a range
+
+# WIP FINISH SOON
+
+
+### 7. Operator Overloading
+
+Operator overloading is a great feature. It actually makes C++ code feel more high-level and expressive than many other languages. That said, there's an elephant 
+in the room I have to address:
+
+## DO NOT USE OPERATOR OVERLOADS TO MEAN THINGS DISCONNECTED FROM THE OPERATOR'S MEANING ##
+
+Using operators to mean things disconnected from their normal meanings is where most complaints about operator overloading comes from. It's a problem made worse 
+by other C++ features.
+
+Ya C (C what I did there?), in C, when you see `i * j`, you know that multiplication is going on. You don't necessarily know whether i and j are integer or 
+floating point types, but you know that multiplication is happening.
+
+Meanwhile, when you see `i * j` in C++; you have to poke through documentation to see what i * j could be doing. Oh, and if i and j are polymorphic, you've 
+just entered Fairy Country because now you have to *prove what types i and j are* when the expression runs.
+
+For this reason, the Loam guideline is that any operator overloads shouldn't mean something that is completely disconnected from the operator's original meaning. 
+Do not overload the dereference operator to translate French to English; don't overload the multiplication operator to rotate an image; don't overload the 
+assignment operator to not do any actual assignment.
+
+The one exception (technically) is that you're allowed to overload the send-to-stream and get-from-stream operators. Technically, those operators mean 
+"bit shift", but the C++ STL already uses them all over the place for streams, so it'd be kind of silly to ban them.
+
+## This file is likely to change as Loam and my own personal coding style evolve. For now though, this covers 95% of the coding conventions that come up on a day-to-day basis in Loam
 

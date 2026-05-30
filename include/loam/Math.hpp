@@ -70,7 +70,7 @@ namespace loam {
     requires std::is_arithmetic_v<T>
     float sqrt_lookup(T n) {
         static_assert(std::is_arithmetic_v<T>, "Use an arithmetic value for loam::sqrt_lookup!");
-        assert(n <= SQRT_MAX && "Went above SQRT_MAX!");
+        assert(n < SQRT_MAX && "Went above SQRT_MAX!");
         if constexpr (std::is_floating_point_v<T>) {
             if (n < 1) return std::sqrt(n);
             size_t below = static_cast<size_t>(n);

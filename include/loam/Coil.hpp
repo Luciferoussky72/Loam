@@ -11,7 +11,6 @@ namespace loam {
     template <typename T>
     class coil_ptr;
 
-
     /**
      * Provides utilities to manage memory similarly to the stack. The idea is to bridge the performance gap between the heap and stack
      * @author luciferoussky72

@@ -22,6 +22,16 @@ if (NOT Python3_FOUND)
 endif()
 
 add_library(Loam STATIC
+        # ImGui stuff, as Loam uses ImGui's SDL implementation for debug UI
+        libraries/imgui/imgui.cpp
+        libraries/imgui/imgui_draw.cpp
+        libraries/imgui/imgui_tables.cpp
+        libraries/imgui/imgui_widgets.cpp
+        libraries/imgui/imgui_demo.cpp
+        libraries/imgui/backends/imgui_impl_sdl3.cpp
+        libraries/imgui/backends/imgui_impl_sdlgpu3.cpp
+
+        # Actual Loam stuff
         src/Engine.cpp
         src/Gamepad.cpp
         src/Loader.cpp
@@ -34,15 +44,7 @@ add_library(Loam STATIC
         src/Shapes.cpp
         src/Sound.cpp
 
-        # ImGui stuff, as Loam uses ImGui's SDL implementation for debug UI
-        libraries/imgui/imgui.cpp
-        libraries/imgui/imgui_draw.cpp
-        libraries/imgui/imgui_tables.cpp
-        libraries/imgui/imgui_widgets.cpp
-        libraries/imgui/imgui_demo.cpp
-        libraries/imgui/backends/imgui_impl_sdl3.cpp
-        libraries/imgui/backends/imgui_impl_sdlgpu3.cpp
-        include/loam/Lifetimes.hpp
+
 )
 
 
