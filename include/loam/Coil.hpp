@@ -4,6 +4,9 @@
 #include <cstddef>
 #include <compare>
 #include <new>
+#include <memory>
+#include <SDL3/SDL_log.h>
+
 namespace loam {
     /**
      * A special pointer class for safely managing Coil memory
@@ -18,21 +21,25 @@ namespace loam {
      * Q: Why is it a coil?
      * A: It's more interesting of a name than "Arena" and gets across how this class differs from a traditional arena
      * @note this object cannot store objects with nontrivial destructors; use other allocators for non-POD types
+     * @note this class's companion class is opt-in by default because it has overhead if you don't use it
      */
-    template<size_t coil_ptr_slot_count = 16, bool enable_coil_ptr = true>
+    template<bool enable_coil_ptr = false, size_t coil_ptr_slot_count = 0>
     class Coil {
     public:
         template <typename T>
         friend class coil_ptr;
 
         /**
-         * Constructs a memory coil object
+         * Constructs a Coil
          * @param capacity the capacity of the coil (in bytes)
-         * @note the capacity is rounded to the next highest multiple of 8
+         * @note the capacity is rounded to the next highest multiple of 8 to keep alignment
          */
         Coil(size_t capacity) :
             capacity((capacity + 7) & ~static_cast<size_t>(7)) {
-            data = new (std::nothrow) char[this->capacity];
+            data = static_cast<char*>(operator new(this->capacity, std::nothrow));
+            if (!data) {
+                SDL_Log("Failed to allocate a Coil allocator's buffer!");
+            }
         }
 
         /**
@@ -40,7 +47,7 @@ namespace loam {
          * @note this destructor feels too simple
          */
         ~Coil() {
-            delete[] data;
+            operator delete(data);
         }
 
         /**
@@ -61,26 +68,32 @@ namespace loam {
          * Allocates memory and returns a typed pointer to it
          * @param bytes the amount of bytes to allocate
          * @tparam T the type to allocate; must be a trivially destructible type
-         * @param alignment the byte count will be rounded to the next highest multiple of this; defaults to 8
+         * @param alignment the byte count will be rounded to the next highest multiple of this; defaults to alignof(T)
          * @return a pointer to start of the allocated block of memory
          */
         template <typename T>
         requires std::is_trivially_destructible_v<T>
-        [[nodiscard]] T* alloc(size_t bytes, size_t alignment = 8) {
-            static_assert(std::is_trivially_destructible_v<T>,
-            "Cannot allocate nontrivially destructible types in a Coil; "
-            "doing so would send your program to The Void of No Return! (may be false)");
+        [[nodiscard]] T* alloc(size_t bytes, size_t alignment = alignof(T)) {
+            size_t space = capacity - current_point;
 
-            bytes = (bytes + alignment - 1) & ~(alignment - 1);
+            void* aligned_ptr = data + current_point;
+            bool state = std::align(alignment, bytes, aligned_ptr, space);
+            if (!state) {
+                assert(!"Coil memory overrun. Allocate more to not send your program to The Void of No Return! (may not actually happen)");
+                return nullptr;
+            }
 
-            assert(current_point + bytes < capacity &&
+            size_t bytes_used = capacity - current_point - space + bytes;
+            assert(current_point + bytes_used <= capacity &&
                 "Coil memory overrun. Allocate more to not send your program to The Void of No Return! (may not actually happen)");
 
-            T* tmp = static_cast<T*>(data + current_point);
-            current_point += bytes;
-            size_of_last_alloc = bytes;
-            last_alloc_was_safe = false;
-            return tmp;
+            current_point += bytes_used;
+            size_of_last_alloc = bytes_used;
+            if constexpr (enable_coil_ptr) {
+                last_alloc_was_safe = false;
+            }
+
+            return static_cast<T*>(aligned_ptr);
         }
 
         /**
@@ -93,7 +106,7 @@ namespace loam {
             size_of_last_alloc = 0;
 
             if constexpr (enable_coil_ptr) {
-                if (last_alloc_was_safe) {
+                if (last_alloc_was_safe and current_slot > 0) {
                     coil_ptr_slots[current_slot-1] = false;
                     last_alloc_was_safe = false;
                 }
@@ -125,18 +138,13 @@ namespace loam {
          * @return a coil_ptr object that functions similarly to std::weak_ptr
          */
         template <typename T>
-        requires std::is_trivially_destructible_v<T>
+        requires std::is_trivially_destructible_v<T> and enable_coil_ptr
         [[nodiscard]] coil_ptr<T> safe_alloc(size_t bytes, size_t alignment = 8) {
-            static_assert(enable_coil_ptr, "The enable_coil_ptr template parameter must be true to use safe_alloc!");
-            static_assert(std::is_trivially_destructible_v<T>,
-                "Cannot allocate nontrivially destructible types in a Coil; "
-                "doing so would send your program to The Void of No Return! (may be false)");
-
             assert(current_slot < coil_ptr_slot_count && "Ran out of coil_ptr slots! Allocate more!");
             coil_ptr_slots[current_slot] = true;
-            T* tmp = this->alloc<T>(bytes, alignment);
+            T* tmp = alloc<T>(bytes, alignment);
             last_alloc_was_safe = true;
-            return coil_ptr<T>(tmp, num_unwinds, coil_ptr_slots[current_slot++]);
+            return coil_ptr<T>(tmp, num_unwinds, coil_ptr_slots + (current_slot++));
         }
     private:
         size_t capacity;
@@ -164,7 +172,7 @@ namespace loam {
          * @param parent_num_unwinds the parent Coil's number of unwinds this object comes from
          * @param slot the slot within its parent's coil_ptr_slots that it gets
          */
-        coil_ptr(T* raw_ptr, const size_t& parent_num_unwinds, const bool& slot)
+        coil_ptr(T* raw_ptr, const size_t& parent_num_unwinds, bool* slot)
         : parent_num_unwinds_reference(parent_num_unwinds), slot(slot), raw_ptr(raw_ptr), num_unwinds_parent_at_creation(parent_num_unwinds) {}
 
         /**
@@ -172,7 +180,7 @@ namespace loam {
          * @return the internal raw pointer if the parent Coil hasn't been unwound and the coil_ptr hasn't been invalidated via rewinding, nullptr otherwise
          */
         [[nodiscard]] T* safe_get() {
-            if (num_unwinds_parent_at_creation != parent_num_unwinds_reference or !slot) {
+            if (num_unwinds_parent_at_creation != parent_num_unwinds_reference or !*slot) {
                 return nullptr;
             }
             return raw_ptr;
@@ -219,15 +227,9 @@ namespace loam {
         [[nodiscard]] friend std::strong_ordering operator<=>(const coil_ptr& a, const coil_ptr& b) {
             return a.raw_ptr <=> b.raw_ptr;
         }
-        /**
-         * Compares the objects by their internal pointers' memory addresses
-         */
-        [[nodiscard]] friend bool operator==(const coil_ptr& a, const coil_ptr& b) {
-            return a.raw_ptr == b.raw_ptr;
-        }
     private:
         const size_t& parent_num_unwinds_reference;
-        const bool& slot;
+        const bool* slot;
 
         T* raw_ptr;
 

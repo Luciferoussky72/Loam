@@ -98,6 +98,28 @@ namespace loam {
         }
 
         /**
+         * Move-pushes a new value to a Spool
+         * @param value the value to push to the Spool
+         */
+        void push(T&& value) {
+            assert(current_point < capacity && "Spool overrun! Allocate a larger spool if you don't want your program to enter The Void of No Return!");
+            new (memory + current_point) T(std::move(value));
+            ++current_point;
+        }
+
+        /**
+         * Emplaces a new value into a Spool
+         * @param args the arguments you want to pass into the object's constructor
+         * @note works like std::vector's push_back
+         */
+        template <typename... Args>
+        void emplace(Args&&... args) {
+            assert(current_point < capacity && "Spool overrun! Allocate a larger spool if you don't want your program to enter The Void of No Return!");
+            new (memory + current_point) T(std::forward<Args>(args)...);
+            ++current_point;
+        }
+
+        /**
          * Clears a spool, which is a very fast operation for trivial types, considering this is only changing two variables,
          * but if the spool's type is not trivially destructible, the spool walks itself and call destructors
          */
@@ -164,7 +186,7 @@ namespace loam {
          * @return a spool_ptr to the nth slot
          */
         [[nodiscard]] spool_ptr get_spool_ptr(size_t n) {
-            return spool_ptr(&at(n), generation);
+            return spool_ptr(&at(n), &generation);
         }
 
         /**
@@ -184,9 +206,9 @@ namespace loam {
         }
 
         /**
-         * @return the size of the Spool (clearly)
+         * @return the capacity of the Spool (clearly)
          */
-        [[nodiscard]] size_t get_size() const {
+        [[nodiscard]] size_t get_capacity() const {
             return capacity;
         }
 
@@ -211,15 +233,15 @@ namespace loam {
              * @param raw_ptr the raw pointer to use
              * @param parent_generation the current generation of the parent
              */
-            spool_ptr(T* raw_ptr, const size_t& parent_generation)
-            : raw_ptr(raw_ptr), parent_generation_reference(parent_generation), parent_generation_at_creation(parent_generation) {}
+            spool_ptr(T* raw_ptr, size_t* parent_generation)
+            : raw_ptr(raw_ptr), parent_generation_pointer(parent_generation), parent_generation_at_creation(*parent_generation) {}
 
             /**
              * Gets the pointer in a similar fashion to weak_ptr
              * @return the internal raw pointer if the parent Spool hasn't been cleared, nullptr otherwise
              */
             [[nodiscard]] T* safe_get() {
-                if (parent_generation_at_creation != parent_generation_reference) {
+                if (parent_generation_at_creation != *parent_generation_pointer) {
                     return nullptr;
                 }
                 return raw_ptr;
@@ -274,7 +296,7 @@ namespace loam {
             }
         private:
             T* raw_ptr;
-            const size_t& parent_generation_reference;
+            const size_t* parent_generation_pointer;
             const size_t parent_generation_at_creation;
         };
 
