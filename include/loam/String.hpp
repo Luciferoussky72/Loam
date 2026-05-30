@@ -91,8 +91,6 @@ namespace loam {
             return buffer[length_];
         }
 
-
-
         char* data() {
             return buffer;
         }
@@ -115,7 +113,47 @@ namespace loam {
             return *this;
         }
 
+        String& append(char c) {
+            if (length_ + 1 > CAPACITY) {
+                SDL_Log("Tried to append too many characters into a Loam String!(the append was a no-op instead of sending your program to The Void of No Return!)");
+                return *this;
+            }
+            buffer[length_] = c;
+            ++length_;
+            return *this;
+        }
+
         String& unsafe_append(std::string_view view) {
+            auto begin = view.cbegin();
+            auto end = view.cend();
+            std::copy(begin, end, buffer);
+            return *this;
+        }
+
+        String& prepend(std::string_view view) {
+            if (view.length() + length_ > CAPACITY) {
+                SDL_Log("Tried to prepend a string that was too long into a Loam String! (the prepend was a no-op instead of sending your program to The Void of No Return!)");
+                return *this;
+            }
+            unsafe_shift_characters_forward(view.length());
+            for (size_t i = 0; i < view.length(); ++i) {
+                buffer[i] = view[i];
+            }
+            return *this;
+        }
+
+        String& prepend(char c) {
+            if (length_ + 1 > CAPACITY) {
+                SDL_Log("Tried to prepend too many characters into a Loam String!(the prepend was a no-op instead of sending your program to The Void of No Return!)");
+                return *this;
+            }
+            unsafe_shift_characters_forward(1);
+            buffer[0] = c;
+            return *this;
+        }
+
+        String& unsafe_prepend(std::string_view view) {
+            unsafe_shift_characters_forward(view.length());
             auto begin = view.cbegin();
             auto end = view.cend();
             std::copy(begin, end, buffer);
@@ -153,15 +191,81 @@ namespace loam {
             return *this;
         }
 
+        String& insert(size_t index, std::string_view view) {
+            if (view.length() + length_ > CAPACITY) {
+                SDL_Log("Tried to insert too long of a string into a Loam String! (the insertion was a no-op instead of sending your program to The Void of No Return!)");
+                return *this;
+            }
+            unsafe_shift_characters_forward(view.length());
+            for (size_t i = 0; i < view.length(); ++i) {
+                buffer[index + i] = view[i];
+            }
+            return *this;
+        }
+
+        String& insert(size_t index, std::string_view view, size_t count) {
+            if (count + length_ > CAPACITY) {
+                SDL_Log("Tried to insert too long of a string into a Loam String! (the insertion was a no-op instead of sending your program to The Void of No Return!)");
+                return *this;
+            }
+            unsafe_shift_characters_forward(count);
+            for (size_t i = 0; i < count; ++i) {
+                buffer[index + i] = view[i];
+            }
+            return *this;
+        }
+
+        String& insert(size_t index, std::string_view view, size_t view_index, size_t count) {
+            if (count + length_ > CAPACITY) {
+                SDL_Log("Tried to insert too long of a string-slice into a Loam String! (the insertion was a no-op instead of sending your program to The Void of No Return!)");
+                return *this;
+            }
+            std::string_view tmp = view.substr(view_index, count);
+            unsafe_shift_characters_forward(tmp.length());
+            for (size_t i = 0; i < tmp.length(); ++i) {
+                buffer[index + i] = tmp[i];
+            }
+            return *this;
+        }
+
+        String& replace(size_t index, size_t count, std::string_view view) {
+            char* begin_index = buffer + index;
+            char* end_index = buffer + std::min(index + count, length_);
+
+            if (end_index > buffer + CAPACITY) {
+                SDL_Log("Tried to write too long of a string into a Loam String! (the write was a no-op instead of sending your program to The Void of No Return!)");
+                return *this;
+            }
+
+            size_t i = 0;
+            while (i < view.length() and begin_index != end_index) {
+                *begin_index = view[i];
+                ++begin_index;
+                ++i;
+            }
+            return *this;
+        }
+
+
+
 
 
         friend String operator+(const String& string, std::string_view view) {
-            string.append(view);
-            return string;
+            String tmp = string;
+
+            return tmp.append(view);
         }
-        //FIX!!
-        friend String operator+(std::string_view view, String string) {
-            return string.append(view);
+        friend String operator+(const String& string, char c) {
+            String tmp = string;
+            return tmp.append(c);
+        }
+        friend String operator+(std::string_view view, const String& string) {
+            String tmp = string;
+            return tmp.prepend(view);
+        }
+        friend String operator+(char c, const String& string) {
+            String tmp = string;
+            return tmp.prepend(c);
         }
         String& operator+=(std::string_view view) {
             return this->append(view);
@@ -171,7 +275,9 @@ namespace loam {
             return std::string_view(a) <=> std::string_view(b);
         }
 
-
+        operator std::string() const {
+            return std::string(std::string_view(*this));
+        }
         operator std::string_view() const {
             return std::string_view(buffer, length_);
         }

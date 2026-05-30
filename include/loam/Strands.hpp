@@ -145,13 +145,22 @@ namespace loam {
 
         /**
          * A companion pointer type with move semantics that automatically frees itself
-         * when it goes out of scope
+         * when it goes out of scope similar to std::unique_ptr
          * @warning make sure to not carelessly pass out pointers via this object; you can easily send your program to The Void of No Return!
          */
         class strand_ptr {
         public:
+            /**
+             * Constructs a strand_ptr
+             * @param ptr the raw pointer the object should use
+             * @param parent the parent object of the pointer
+             */
             [[nodiscard]] strand_ptr(T* ptr, Strands* parent) : raw_ptr(ptr), parent(parent) {}
 
+            /**
+             * Hands the pointer's memory back to the parent, or does nothing if the object has been moved from
+             * @warning the internal pointer becomes invalid after this destructor runs; using it afterwards would send your program to The Void of No Return!
+             */
             ~strand_ptr() {
                 if (raw_ptr and parent) {
                     parent->free(raw_ptr);
@@ -161,13 +170,22 @@ namespace loam {
             strand_ptr(const strand_ptr&) = delete("You can't copy a strand_ptr because they're meant to save you from The Void of No Return.");
             strand_ptr& operator=(const strand_ptr&) = delete("You can't copy-assign a strand_ptr because they're meant to save you from The Void of No Return.");
 
+            /**
+             * Move-constructs a strand_ptr
+             * @param other the strand_ptr to move from
+             * @warning the moved-from pointer is invalidated; don't use it unless you want your program to enter The Void of No Return!
+             */
             [[nodiscard]] strand_ptr(strand_ptr&& other) noexcept {
-                if (this == &other) return;
                 raw_ptr = other.raw_ptr;
                 other.raw_ptr = nullptr;
                 parent = other.parent;
                 other.parent = nullptr;
             }
+            /**
+             * Move-assigns a strand_ptr
+             * @param other the strand_ptr to move from
+             * @return the moved_from pointer is invalidated; dereferencing it will send your program to The Void of No Return!
+             */
             strand_ptr& operator=(strand_ptr&& other) noexcept {
                 if (this == &other) return *this;
                 raw_ptr = other.raw_ptr;
@@ -179,6 +197,7 @@ namespace loam {
 
             /**
              * Frees and nulls the object's pointer
+             * @warning the pointer becomes invalid after calling this; don't use it anymore unless you want to enter The Void of No Return!
              */
             void free() {
                 if (raw_ptr and parent) {
@@ -186,16 +205,33 @@ namespace loam {
                 }
             }
 
+            /**
+             * Gets the internal raw pointer
+             * @return the internal raw pointer
+             */
             [[nodiscard]] T* get() {
                 return raw_ptr;
             }
 
+            /**
+             * Dereferences the raw pointer
+             * @return a reference to the data that the internal pointer points to
+             */
             [[nodiscard]] T& operator*() {
                 return *raw_ptr;
             }
+
+            /**
+             * Used if the internal pointer has members
+             * @return the raw pointer because that's how operator-> overloads work
+             */
             [[nodiscard]] T* operator->() {
                 return raw_ptr;
             }
+
+            /**
+             * Compares a and b by their memory addresses
+             */
             friend std::strong_ordering operator<=>(const strand_ptr& a, const strand_ptr& b) {
                 return a.raw_ptr <=> b.raw_ptr;
             }
