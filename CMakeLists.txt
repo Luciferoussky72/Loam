@@ -63,10 +63,17 @@ endif()
 
 
 target_compile_options(Loam PRIVATE
+        # Set the STL to the C++26 STL
         -std=c++26
+        # Turn on reflection (has no runtime cost, thankfully, but we still need to tell the compiler to turn it on)
         -freflection
+        # Turn off exceptions
         -fno-exceptions
+        # Turn off errno to speed up math functions
+        -fno-math-errno
+        # The warning flags
         -Wall -Wextra -Wpedantic -Werror
+        # Conditionally compile based on whether it's a debug or release build
         $<$<CONFIG:Debug>: -O0 -g>
         $<$<CONFIG:Release>: -O2>
 )

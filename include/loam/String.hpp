@@ -126,7 +126,8 @@ namespace loam {
         String& unsafe_append(std::string_view view) {
             auto begin = view.cbegin();
             auto end = view.cend();
-            std::copy(begin, end, buffer);
+            std::copy(begin, end, buffer + length_);
+            length_ += view.length();
             return *this;
         }
 

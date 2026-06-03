@@ -18,7 +18,7 @@ namespace loam {
      * @author luciferoussky72
      * @note has some key differences from std::vector, like being fixed-size after creation, being able to only grow or be cleared,
      * and having less overhead. This is kind of like having a Java array, but less of a pain the neck to use lol
-     * @note references and pointers into Spool memory are *guaranteed* to stay valid *until the Spool is cleared*
+     * @note references and pointers into Spool memory are *guaranteed* to stay valid *until the Spool is cleared or reassigned*
      * @tparam T the type of variables that the Spool will store
      */
     template <typename T>
@@ -36,7 +36,28 @@ namespace loam {
          * @param capacity the capacity of the spool; constant after the object is created!
          */
         Spool(size_t capacity) : capacity(capacity) {
-            memory = static_cast<T*>(operator new(sizeof(T) * capacity, std::nothrow));
+            memory = static_cast<T*>(operator new(sizeof(T) * capacity, std::align_val_t{alignof(T)}, std::nothrow));
+        }
+
+        /**
+         * Constructs a spool based on an initializer list/array literal
+         * @note the Spool's capacity will be the number of elements in the initializer list
+         * @param list the initializer list to use
+         */
+        Spool(std::initializer_list<T> list) : capacity(list.size()) {
+            memory = static_cast<T*>(operator new(capacity * sizeof(T), std::align_val_t{alignof(T)}, std::nothrow));
+            std::copy(list.begin(), list.end(), memory);
+        }
+
+
+        Spool& operator=(std::initializer_list<T> list) {
+            if (list.size() > capacity) {
+                SDL_Log("A Spool was assigned to an initializer list that was too big! (program crashed because that's better than going to The Void of No Return!)");
+                std::abort();
+            }
+            std::copy(list.begin(), list.end(), memory);
+            current_point = list.size();
+            return *this;
         }
 
         /**
@@ -60,6 +81,7 @@ namespace loam {
                 SDL_Log("Initialized a Loam Spool with an initializer list larger than its size! (the list was truncated instead of sending your program to The Void of No Return!");
             }
             std::uninitialized_copy(list.cbegin(), list.cbegin() + current_point, memory);
+            ++generation;
         }
 
         /**
@@ -79,7 +101,7 @@ namespace loam {
                     memory[i].~T();
                 }
             }
-            ::operator delete(memory);
+            operator delete(memory);
         }
 
         Spool(const Spool&) = delete("Copying a Spool would cause strange heap corruptions; sending your program into The Void of No Return!");
@@ -110,7 +132,7 @@ namespace loam {
         /**
          * Emplaces a new value into a Spool
          * @param args the arguments you want to pass into the object's constructor
-         * @note works like std::vector's push_back
+         * @note works like std::vector's emplace_back
          */
         template <typename... Args>
         void emplace(Args&&... args) {

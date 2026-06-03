@@ -453,9 +453,9 @@ I don't think this needs an explanation really; PascalCase for object type names
 
 The one exception is "companion" classes. Things like iterators, handles, and pointers catered to a specific class should use snake_case instead.
 
-##### 3. SCREAMING_SNAKE_CASE for macros
+##### 3. SCREAMING_SNAKE_CASE for macros and constants, especially global constants
 
-This is convention and makes it immediately obvious that macros are macros.
+This is convention and makes it immediately obvious what macros and global constants are
 
 ##### Alright, now for actual naming conventions.
 
@@ -480,8 +480,50 @@ Loam also has some conventions for generic variable names that get used for simp
 12. a, b, c, etc. -> convention for functions and operator overloads that take a few parameters that make sense to represent simply
 13. min & max -> represent the minimum and maximum of a range
 
-# WIP FINISH SOON
+##### 2. Functions and methods (I usually just say "function" to mean both)
 
+So, function naming is pretty much the same as variable naming. Make sure it's descriptive but not overly so. Loam does have two special conventions for naming 
+functions though:
+
+##### 1. unsafe_ prefix
+
+This is another Rust-ism that's found its way into Loam. Basically, if a function can cause some weird corruptions if someone uses it incorrectly, you should 
+prefix the name with unsafe_. 
+
+The reasoning is that Loam is meant to be a mostly footgun-free library, so any footguns in Loam should be immediately documented as such. It also comes with the 
+nice pro that finding bugs can sometimes be as easy as grepping for "unsafe."
+
+An example from Loam is as follows:
+
+```c++
+    String& shift_characters_forward(size_t index, size_t shifts) {
+        if (length_ + shifts > CAPACITY) {
+            SDL_Log("Tried to shift characters too far forwards in a Loam String! (the shift was a no-op instead of sending your program to The Void of No Return!)");
+            return *this;
+        }
+        return unsafe_shift_characters_forward(index, shifts);
+    }
+
+    String& unsafe_shift_characters_forward(size_t index, size_t shifts) {
+        for (size_t i = 0; i < shifts; ++i) {
+            ++length_;
+            for (size_t j = length_; j > index; --j) {
+                buffer[j] = buffer[j-1];
+            }
+        }
+        return *this;
+    }
+```
+
+This is a great example because not only do we have both a safe and unsafe version, the safe version actually calls the unsafe version. The reason is that 
+the safe version has already proven that calling unsafe_shift_characters_forward is safe, and you'll see that pattern a lot with unsafe functions in Loam.
+
+##### 2. Prefer "y_from_x" over "x_to_y" for variable transformations
+
+If a variable transforms one type into another, prefer "y_from_x" over "x_to_y."
+
+That said, "x_to_y" often works better for transforming a variable into something like data in a JSON file, so feel free to write "class_to_json" for something 
+like that.
 
 ### 7. Operator Overloading
 

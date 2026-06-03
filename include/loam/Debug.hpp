@@ -7,16 +7,12 @@
  * with the concept, and editor tooling has been slow to adopt it- at the time of writing, Clang is still mostly reflection-blind
  */
 
-/**
- * Controls whether this header defines macros or not
- * @note undefining or commenting out this macro will make it so all of this header's macros are undefined
- */
-#define LOAM_DEFINE_DEBUG_MACROS
-
 #include <iomanip>
 #include <type_traits>
 #include <iostream>
 #include <meta>
+#include <expected>
+
 #include "imgui.h"
 
 namespace loam {
@@ -80,17 +76,34 @@ namespace loam {
      * @param value the value within the enum that you want as a string
      * @return returns just the enumerator name, e.g. "East" rather than "Directions::East"
      */
-    template<typename E>
+    template <typename E>
     requires std::is_enum_v<E>
-    constexpr std::string_view string_from_enum(E value) {
+    constexpr std::expected<std::string_view, const char*> string_from_enum(E value) {
         //as this is constexpr, we can simply run a for loop over all members in the enum, looking for our match
         template for (constexpr auto e : std::define_static_array(std::meta::enumerators_of(^^E))) {
             if (value == [:e:]) {
                 return std::meta::identifier_of(e);
             }
         }
-        return "enum member is lost in Fairy Country. (enum member not found)";
+        return std::unexpected("Couldn't find the enum value (somehow)!");
     }
+
+    /**
+     * Gets an enum value from a string
+     * @tparam E the enum to get the value from
+     * @param string the string to get the identifier based on
+     * @return either the enumerator value or an error instance if it can't find a match
+     */
+    template<typename E>
+    requires std::is_enum_v<E>
+    constexpr std::expected<E, const char*> enum_from_string(std::string_view string) {
+        template for (constexpr auto e : std::define_static_array(std::meta::enumerators_of(^^E))) {
+            if (string == std::meta::identifier_of(e))
+                return [:e:];
+        }
+        return std::unexpected("Couldn't find an associated enum value!");
+    }
+
 
     /**
      * Calls a function and prints its results for debugging purposes
