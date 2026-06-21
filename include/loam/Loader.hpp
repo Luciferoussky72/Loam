@@ -28,7 +28,6 @@ namespace loam {
 
         /**
          * Loads a new SDL_Texture via the Loader
-         * @param name the name you want to use to access the texture
          * @param path the relative path of the file to the executable's path
          * @return true on success, false on failure
          */

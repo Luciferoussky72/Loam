@@ -4,10 +4,10 @@
 #include <SDL3/SDL_log.h>
 
 namespace loam {
-    [[nodiscard]] std::optional<Gamepad> probe_for_gamepads(const SDL_Event* event) {
-        if (event->type == SDL_EVENT_GAMEPAD_ADDED) {
+    [[nodiscard]] std::optional<Gamepad> probe_for_gamepads(const SDL_Event& event) {
+        if (event.type == SDL_EVENT_GAMEPAD_ADDED) {
             SDL_Log("Gamepad was connected! Attempting to open now.");
-            if (SDL_Gamepad* gamepad = SDL_OpenGamepad(event->gdevice.which)) {
+            if (SDL_Gamepad* gamepad = SDL_OpenGamepad(event.gdevice.which)) {
                 SDL_Log("Gamepad opened: %s", SDL_GetGamepadName(gamepad));
                 return Gamepad(gamepad);
             }
@@ -17,7 +17,7 @@ namespace loam {
     }
 
     Gamepad::Gamepad(SDL_Gamepad* gamepad) : gamepad(gamepad) {
-        for (int i = 0; i < SDL_GAMEPAD_BUTTON_COUNT; i++) {
+        for (size_t i = 0; i < SDL_GAMEPAD_BUTTON_COUNT; ++i) {
             current_gamepad_buttons[i] = SDL_GetGamepadButton(gamepad, static_cast<SDL_GamepadButton>(i));
         }
     }
@@ -29,16 +29,16 @@ namespace loam {
     }
 
     void Gamepad::update() {
-        for (int i = 0; i < SDL_GAMEPAD_BUTTON_COUNT; i++) {
+        for (size_t i = 0; i < SDL_GAMEPAD_BUTTON_COUNT; ++i) {
             previous_gamepad_buttons[i] = current_gamepad_buttons[i];
             current_gamepad_buttons[i] = SDL_GetGamepadButton(gamepad, static_cast<SDL_GamepadButton>(i));
         }
     }
 
-    void Gamepad::process_event(const SDL_Event* event) {
-        if (event->type == SDL_EVENT_GAMEPAD_REMOVED) {
+    void Gamepad::process_event(const SDL_Event& event) {
+        if (event.type == SDL_EVENT_GAMEPAD_REMOVED) {
             SDL_Log("Gamepad was disconnected! Attempting to close now.");
-            if (gamepad == SDL_GetGamepadFromID(event->gdevice.which)) {
+            if (gamepad == SDL_GetGamepadFromID(event.gdevice.which)) {
                 SDL_CloseGamepad(gamepad);
                 gamepad = nullptr;
                 return;

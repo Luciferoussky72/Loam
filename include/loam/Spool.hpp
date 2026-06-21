@@ -36,7 +36,7 @@ namespace loam {
          * @param capacity the capacity of the spool; constant after the object is created!
          */
         Spool(size_t capacity) : capacity(capacity) {
-            memory = static_cast<T*>(operator new(sizeof(T) * capacity, std::align_val_t{alignof(T)}, std::nothrow));
+            buffer = static_cast<T*>(operator new(sizeof(T) * capacity, std::align_val_t{alignof(T)}, std::nothrow));
         }
 
         /**
@@ -45,8 +45,9 @@ namespace loam {
          * @param list the initializer list to use
          */
         Spool(std::initializer_list<T> list) : capacity(list.size()) {
-            memory = static_cast<T*>(operator new(capacity * sizeof(T), std::align_val_t{alignof(T)}, std::nothrow));
-            std::copy(list.begin(), list.end(), memory);
+            buffer = static_cast<T*>(operator new(capacity * sizeof(T), std::align_val_t{alignof(T)}, std::nothrow));
+            current_point = capacity;
+            std::uninitialized_copy(list.begin(), list.end(), buffer);
         }
 
 
@@ -55,18 +56,9 @@ namespace loam {
                 SDL_Log("A Spool was assigned to an initializer list that was too big! (program crashed because that's better than going to The Void of No Return!)");
                 std::abort();
             }
-            std::copy(list.begin(), list.end(), memory);
+            std::copy(list.begin(), list.end(), buffer);
             current_point = list.size();
             return *this;
-        }
-
-        /**
-         * Constructs a Spool based on an initializer list
-         * @param list the initializer list to use; the spool takes on the size of this list
-         */
-        Spool(std::initializer_list<T> list) : capacity(list.size()), current_point(capacity) {
-            memory = static_cast<T*>(operator new(sizeof(T) * capacity, std::nothrow));
-            std::uninitialized_copy(list.cbegin(), list.cend(), memory);
         }
 
         /**
@@ -75,12 +67,12 @@ namespace loam {
          * @param capacity the capacity of the spool; constant after the object is created!
          */
         Spool(std::initializer_list<T> list, size_t capacity) : capacity(capacity) {
-            memory = static_cast<T*>(operator new(sizeof(T) * capacity, std::nothrow));
+            buffer = static_cast<T*>(operator new(sizeof(T) * capacity, std::nothrow));
             current_point = std::min(list.size(), capacity);
             if (list.size() > capacity) {
                 SDL_Log("Initialized a Loam Spool with an initializer list larger than its size! (the list was truncated instead of sending your program to The Void of No Return!");
             }
-            std::uninitialized_copy(list.cbegin(), list.cbegin() + current_point, memory);
+            std::uninitialized_copy(list.begin(), list.begin() + current_point, buffer);
             ++generation;
         }
 
@@ -89,7 +81,7 @@ namespace loam {
          * @return true if the memory is not nullptr
          */
         [[nodiscard]] bool good() const {
-            return memory;
+            return buffer;
         }
 
         /**
@@ -98,10 +90,10 @@ namespace loam {
         ~Spool() {
             if constexpr (!std::is_trivially_destructible_v<T>) {
                 for (size_t i = 0; i < current_point; ++i) {
-                    memory[i].~T();
+                    buffer[i].~T();
                 }
             }
-            operator delete(memory);
+            operator delete(buffer);
         }
 
         Spool(const Spool&) = delete("Copying a Spool would cause strange heap corruptions; sending your program into The Void of No Return!");
@@ -115,7 +107,7 @@ namespace loam {
          */
         void push(const T& value) {
             assert(current_point < capacity && "Spool overrun! Allocate a larger spool if you don't want your program to enter The Void of No Return!");
-            new (memory + current_point) T(value);
+            new (buffer + current_point) T(value);
             ++current_point;
         }
 
@@ -125,7 +117,7 @@ namespace loam {
          */
         void push(T&& value) {
             assert(current_point < capacity && "Spool overrun! Allocate a larger spool if you don't want your program to enter The Void of No Return!");
-            new (memory + current_point) T(std::move(value));
+            new (buffer + current_point) T(std::move(value));
             ++current_point;
         }
 
@@ -137,7 +129,7 @@ namespace loam {
         template <typename... Args>
         void emplace(Args&&... args) {
             assert(current_point < capacity && "Spool overrun! Allocate a larger spool if you don't want your program to enter The Void of No Return!");
-            new (memory + current_point) T(std::forward<Args>(args)...);
+            new (buffer + current_point) T(std::forward<Args>(args)...);
             ++current_point;
         }
 
@@ -148,7 +140,7 @@ namespace loam {
         void clear() {
             if constexpr (!std::is_trivially_destructible_v<T>) {
                 for (size_t i = 0; i < current_point; ++i) {
-                    memory[i].~T();
+                    buffer[i].~T();
                 }
             }
             current_point = 0;
@@ -163,7 +155,7 @@ namespace loam {
          * @return a reference to the point in the spool
          */
         [[nodiscard]] T& operator[](size_t n) {
-            return memory[n];
+            return buffer[n];
         }
         /**
          * Gets a point in a Spool
@@ -173,7 +165,7 @@ namespace loam {
          * @return a constant reference to the point in the spool
          */
         [[nodiscard]] const T& operator[](size_t n) const {
-            return memory[n];
+            return buffer[n];
         }
 
 
@@ -186,7 +178,7 @@ namespace loam {
          */
         [[nodiscard]] T& at(size_t n) {
             assert(n < current_point && "Tried to poke an out-of-bounds Spool index, which would send your program to The Void of No Return!");
-            return memory[n];
+            return buffer[n];
         }
 
         /**
@@ -198,7 +190,7 @@ namespace loam {
          */
         [[nodiscard]] const T& at(size_t n) const {
             assert(n < current_point && "Tried to read an out-of-bounds Spool index, which would send your program to The Void of No Return!");
-            return memory[n];
+            return buffer[n];
         }
 
 
@@ -216,7 +208,7 @@ namespace loam {
          * @return the start of the Spool's memory
          */
         [[nodiscard]] T* begin() {
-            return memory;
+            return buffer;
         }
 
         /**
@@ -224,7 +216,7 @@ namespace loam {
          * @return the start of the Spool's memory offset by however many elements have been allocated
          */
         [[nodiscard]] T* end() {
-            return memory + current_point;
+            return buffer + current_point;
         }
 
         /**
@@ -323,10 +315,10 @@ namespace loam {
         };
 
         operator std::span<T>() {
-            return std::span(memory, current_point);
+            return std::span(buffer, current_point);
         }
         operator std::span<const T>() const {
-            return std::span(memory, current_point);
+            return std::span(buffer, current_point);
         }
 
 
@@ -341,7 +333,7 @@ namespace loam {
         using iterator        = T*;
         using const_iterator  = const T*;
     private:
-        T* memory;
+        T* buffer;
         const size_t capacity;
         size_t current_point = 0;
 

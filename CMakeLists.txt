@@ -43,10 +43,7 @@ add_library(Loam STATIC
         src/Collisions.cpp
         src/Shapes.cpp
         src/Sound.cpp
-
-
 )
-
 
 # Any custom compile commands should go here; be sure to add warnings for each command for if Python wasn't found
 if (Python3_FOUND)
@@ -60,7 +57,6 @@ else()
 endif()
 
 # end custom compile commands
-
 
 target_compile_options(Loam PRIVATE
         # Set the STL to the C++26 STL
@@ -79,6 +75,9 @@ target_compile_options(Loam PRIVATE
 )
 
 target_include_directories(Loam PUBLIC include/)
+target_include_directories(Loam PUBLIC "libraries/")
 target_include_directories(Loam PUBLIC "libraries/imgui/")
 target_include_directories(Loam PUBLIC "libraries/imgui/backends/")
+target_include_directories(Loam PUBLIC "libraries/tomlplusplus/")
+
 target_link_libraries(Loam PUBLIC SDL3::SDL3 SDL3_mixer::SDL3_mixer)

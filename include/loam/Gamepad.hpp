@@ -17,7 +17,7 @@ namespace loam {
      * cause a gamepad to be claimed twice, sending your program into The Void of No Return! (that last part may not be true)
      * @return an instance of std::optional<Gamepad> for instantiating a new gamepad
      */
-    std::optional<Gamepad> probe_for_gamepads(const SDL_Event* event);
+    std::optional<Gamepad> probe_for_gamepads(const SDL_Event& event);
 
     class Gamepad {
     public:
@@ -44,7 +44,7 @@ namespace loam {
          * cause a gamepad to be freed twice, sending your program into the Void of No Return! (that last part may be exaggerated)
          * @param event a pointer to the SDL_Event to process
          */
-        void process_event(const SDL_Event* event);
+        void process_event(const SDL_Event& event);
 
         /**
          * Checks if a gamepad button is down

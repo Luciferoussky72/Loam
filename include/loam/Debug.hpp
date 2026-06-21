@@ -45,7 +45,7 @@ namespace loam {
 
             //enter a recursive call if the class has an instance of another class as its member
             if constexpr (std::is_aggregate_v<member_type>) {
-                std::print(stream, "\n");
+                std::println(stream);
                 log_object(obj.[:m:], stream);
             } else if constexpr (std::is_convertible_v<member_type, std::string>) {
                 std::print(stream, "\"{}\"\n", obj.[:m:]);
@@ -63,10 +63,20 @@ namespace loam {
      * Gets the name of a type as a string using reflection
      * @note reflection really is a game-changer for stuff like this as before you'd have to use macros for this
      * @tparam T the type name to get
-     * @return the type name as an instance of std::string view
+     * @return the type name as an instance of std::string_view
      */
     template <typename T>
-    consteval std::string_view type_name(T var) {
+    consteval std::string_view type_name(T) {
+        return std::meta::identifier_of(^^T);
+    }
+    /**
+     * Gets the name of a type as a string using reflection
+     * @note reflection really is a game-changer for stuff like this as before you'd have to use macros for this
+     * @tparam T the type name to get
+     * @return the type name as an instance of std::string_view
+     */
+    template <typename T>
+    consteval std::string_view type_name() {
         return std::meta::identifier_of(^^T);
     }
 
@@ -85,7 +95,7 @@ namespace loam {
                 return std::meta::identifier_of(e);
             }
         }
-        return std::unexpected("Couldn't find the enum value (somehow)!");
+        return std::unexpected("Couldn't find the enum value!");
     }
 
     /**
@@ -117,7 +127,7 @@ namespace loam {
     requires std::is_arithmetic_v<T> and std::invocable<F, T>
     void step_through(F&& function, T start, T stop, T step = static_cast<T>(1), std::ostream& stream = std::clog) {
         for (; start <= stop; start += step) {
-            std::print(stream, "Input: {} Result: {}\n", start, function(start));
+            std::println(stream, "Input: {} Result: {}", start, function(start));
         }
     }
 
@@ -137,16 +147,13 @@ namespace loam {
         );
 
         template for (constexpr auto m : members) {
-            std::stringstream text;
             using member_type = [:std::meta::type_of(m):]
 
             if constexpr (std::is_convertible_v<member_type, std::string>) {
-                std::print(text, "{}: \"{}\"", std::meta::identifier_of(m), instance.[:m:]);
+                ImGui::Text(std::format("{}: \"{}\"", std::meta::identifier_of(m), instance.[:m:]).c_str());
             } else {
-                std::print(text, "{}: {}", std::meta::identifier_of(m), instance.[:m:]);
+                ImGui::Text(std::format("{}: {}", std::meta::identifier_of(m), instance.[:m:]).c_str());
             }
-
-            ImGui::Text(text.str().c_str());
         }
 
         ImGui::End();
