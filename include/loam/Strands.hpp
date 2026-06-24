@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <cassert>
 #include <new>
 #include <cstddef>
@@ -88,7 +89,7 @@ namespace loam {
          * Fetches a pointer from the allocator
          * @note make sure to not let the pointer go out of scope, otherwise you will
          * be unable to free the pointer
-         * @return the pointer to the allocator's memory
+         * @return the pointer to the allocator's memory, or nullptr if the allocator is out of memory
          */
         [[nodiscard]] T* alloc() {
             assert(head && "Strands allocator ran out of memory!");
@@ -124,9 +125,11 @@ namespace loam {
         void free(T* free_this) {
             ElementUnion* tmp = reinterpret_cast<ElementUnion*>(free_this);
             assert(free_this &&
-                tmp >= memory &&
-                tmp < memory + num_elements &&
+                reinterpret_cast<std::uintptr_t>(tmp) >= reinterpret_cast<std::uintptr_t>(memory) &&
+                reinterpret_cast<std::uintptr_t>(tmp) <  reinterpret_cast<std::uintptr_t>(memory + num_elements) &&
                 "Tried to free memory not from a Strands allocator!");
+            assert((reinterpret_cast<std::uintptr_t>(tmp) -  reinterpret_cast<std::uintptr_t>(memory)) % sizeof(ElementUnion) == 0 &&
+                "Tried to free a misaligned pointer in a Strands allocator");
             if constexpr (!std::is_trivially_destructible_v<T>) {
                 free_this->~T();
             }
@@ -209,7 +212,7 @@ namespace loam {
              * Gets the internal raw pointer
              * @return the internal raw pointer
              */
-            [[nodiscard]] T* get() {
+            [[nodiscard]] T* unsafe_get() {
                 return raw_ptr;
             }
 
@@ -230,10 +233,17 @@ namespace loam {
             }
 
             /**
+             * Allows you to treat a strand_ptr like a bool in if statements
+             */
+            [[nodiscard]] explicit operator bool() const {
+                return static_cast<bool>(raw_ptr);
+            }
+
+            /**
              * Compares a and b by their memory addresses
              */
             friend std::strong_ordering operator<=>(const strand_ptr& a, const strand_ptr& b) {
-                return a.raw_ptr <=> b.raw_ptr;
+                return std::compare_three_way{}(a.raw_ptr, b.raw_ptr);
             }
         private:
             T* raw_ptr = nullptr;

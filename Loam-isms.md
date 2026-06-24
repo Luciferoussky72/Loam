@@ -54,6 +54,15 @@ remnants of timelines that no longer exist. As described in *Hilda's Book of Bea
 "The chances of surviving a Time Worm attack are almost zero," so "Time Worm" is a fitting way to describe these kinds of errors
 that are likely to outright crash or even worse, let your program keep running in a compromised state.
 
+#### Tide Mice
+This describes warnings about undefined behaviour. I'm not the first to admit that C++ having undefined behaviour is a double-edged sword. While it does let the 
+compiler optimize by assuming it never happens, if you accidentally cause undefined behaviour, you can very easily cause bugs that drive you stark-raving mad. 
+
+Tide Mice in Hilda are creatures summoned by a seemingly innocuous enchantment that gives your friends good luck. Hilda finds it in a book called "How to Aid 
+and Keep thy Friends Forever" and uses it to help her friend and mum. Unfortunately, the enchantment is ...a bit more than she bargained for, and she's now 
+about to accidentally steal their souls! I guess that's one way to keep your friends forever... Anyway, the reference kind of writes itself; both Tide Mice and 
+undefined behaviour seem harmless but turn into way more than you bargained for.
+
 #### "Captured by a theater-loving merman"
 This describes any errors that don't fit into any of the above categories.
 

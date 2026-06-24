@@ -17,6 +17,7 @@ namespace loam {}
 #include <loam/KeyboardMouse.hpp>
 #include <loam/Loader.hpp>
 #include <loam/Math.hpp>
+#include <loam/NotNull.hpp>
 #include <loam/Random.hpp>
 #include <loam/Shapes.hpp>
 #include <loam/Sound.hpp>
@@ -24,6 +25,5 @@ namespace loam {}
 #include <loam/Spritesheet.hpp>
 #include <loam/Strands.hpp>
 #include <loam/String.hpp>
-#include <loam/Tether.hpp>
 #include <loam/Timing.hpp>
 #include <loam/Vec2.hpp>

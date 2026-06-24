@@ -44,7 +44,7 @@ namespace loam {
          * @note should be called once per frame
          * @param event the SDL_Event pointer to process
          */
-        void process_event(const SDL_Event* event);
+        void process_event(const SDL_Event& event);
 
         /**
          * Returns the running state of the Engine object

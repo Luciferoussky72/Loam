@@ -225,7 +225,7 @@ namespace loam {
          * Compares the objects by their internal pointers' memory addresses
          */
         [[nodiscard]] friend std::strong_ordering operator<=>(const coil_ptr& a, const coil_ptr& b) {
-            return a.raw_ptr <=> b.raw_ptr;
+            return std::compare_three_way{}(a.raw_ptr, b.raw_ptr);
         }
     private:
         const size_t& parent_num_unwinds_reference;

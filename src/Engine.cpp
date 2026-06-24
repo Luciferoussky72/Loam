@@ -37,15 +37,15 @@ namespace loam {
         running = false;
     }
 
-    void Engine::process_event(const SDL_Event* event) {
-        switch (event->type) {
+    void Engine::process_event(const SDL_Event& event) {
+        switch (event.type) {
             case SDL_EVENT_QUIT:
             case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
                 running = false;
                 break;
             case SDL_EVENT_WINDOW_RESIZED:
-                window_width = event->window.data1;
-                window_height = event->window.data2;
+                window_width = event.window.data1;
+                window_height = event.window.data2;
                 break;
             default:
                 break;

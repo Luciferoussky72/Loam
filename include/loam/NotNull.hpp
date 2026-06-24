@@ -33,29 +33,33 @@ namespace loam {
             raw_ptr = ptr;
             return *this;
         }
-        //Make sure that the class is trivially copiable
-        static_assert(std::is_trivially_copyable_v<NotNull>);
 
-        NotNull(std::nullptr_t) = delete("This one should be obvious, we're trying to avoid The Void of No Return here!");
-        NotNull& operator=(std::nullptr_t) = delete("This one should be obvious, we're trying to avoid The Void of No Return here!");
+        constexpr NotNull(std::nullptr_t) = delete("This one should be obvious, we're trying to avoid The Void of No Return here!");
+        constexpr NotNull& operator=(std::nullptr_t) = delete("This one should be obvious, we're trying to avoid The Void of No Return here!");
 
         /**
          * Overload for the dereference operator
          */
-        [[nodiscard]] constexpr auto& operator*() const noexcept {
+        [[nodiscard]] constexpr auto& operator*() noexcept {
             return *raw_ptr;
         }
         /**
          * Overload for the arrow operator to make pointers to objects ergonomic
          */
-        [[nodiscard]] constexpr PTR_T operator->() const noexcept {
+        [[nodiscard]] constexpr PTR_T operator->() noexcept {
             return raw_ptr;
         }
 
         /**
          * Implicit conversion to the raw pointer type so that you can easily pass to functions that expect raw pointers
          */
-        [[nodiscard]] constexpr operator PTR_T() const noexcept {
+        [[nodiscard]] constexpr operator PTR_T() noexcept {
+            return raw_ptr;
+        }
+        /**
+         * Implicit conversion to the raw pointer type so that you can easily pass to functions that expect raw pointers
+         */
+        [[nodiscard]] constexpr operator const PTR_T() const noexcept {
             return raw_ptr;
         }
 
@@ -74,4 +78,7 @@ namespace loam {
     private:
         PTR_T raw_ptr;
     };
+
+    //Make sure that the class is trivially copyable
+    static_assert(std::is_trivially_copyable_v<NotNull<int*>>);
 } // loam

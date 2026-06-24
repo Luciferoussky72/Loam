@@ -17,7 +17,7 @@ Some other people write braces like this, making sure the opening and closing br
     }
 ```
 
-And yet still other people write them like this, with no space after the closing parenthesis:
+And yet other people write them like this, with no space after the closing parenthesis:
 ```c++    
     if (true){
         do_stuff();
@@ -35,7 +35,7 @@ how to declare pointers; **arguing with people over style differences that are r
 
 ### 2. That said, if you're style-agnostic, here are the petty style conventions in Loam:
 
-#### Note that as Loam is (at the time of writing) mostly developed by me (luciferoussky72), these are reflective of my personal style conventions
+#### Note that as Loam is (at the time of writing) mostly developed by me (luciferoussky72), these are my personal style conventions
 
 ##### Curly braces should be on the same line as the statement they're associated with:
 ```c++
@@ -46,8 +46,12 @@ if (true) {
 
 ##### Put a space after if, while, for, do, and requires (in concept definitions), and no space after function names:
 ```c++
-while (x <= 10) x++;
-x = func(x);
+while (x <= 10) {
+    x++;
+}
+    
+x = function_call(x);
+void function_declaration();
 ```
 
 ##### Declare pointers with the asterisk attached to the type:
@@ -55,14 +59,11 @@ x = func(x);
 int* ptr = &x;
 ```
 
-This makes it clear that ptr is a pointer-to-int.
-Do note that one of the classic arguments against this style for declaring pointers is cases like this:
+Keep in mind that the declarator only applies to the variable it's next to, so you can't write:
 ```c++
+//x is an int-pointer while y is just an int
 int* x, y;
 ```
-
-Here, x is a pointer-to-int while y is just a normal int. That said, I see this as more of a pro than a con. I 
-dislike multiple declarations on one line, and this helps discourage them
 
 ##### Speaking of... avoid multiple declarations on one line:
 ```c++
@@ -70,12 +71,14 @@ int x = 50;
 int y = 100;
 ```
 
-is much cleaner than:
+is much cleaner and clearer than:
 ```c++
 int x = 50, y = 100;
 ```
 
 ##### Declare public members of a class first; they're what the people using the class actually care about:
+
+###### I don't even know why the AP CS curriculum encourages declaring private members first...
 ```c++
 class Foo {
 public:
@@ -87,17 +90,16 @@ private:
 
 ### 3. Passing conventions are the weird hill I die on
 
-Okay, maybe it's not a super weird hill, but this is still something I'm very insistent about.
+Okay, maybe it's not a super weird hill (fairy mounds are super weird hills), but this is still something I'm very insistent about.
 
-Basically, C++ gives you a lot of ways to pass variables to functions; which is great, I'm not denying that, but I have some pretty strict ground 
+Basically, C++ gives you a lot of ways to pass variables to functions; which is great; I'm not denying that, but I have some pretty strict ground 
 rules about how to use each, and Loam uses only four of them:
 
 ##### Passing by value:
 ```c++
-    //syntax for passing by value
     void func(int x);
 ```
-This should be used where the function needs simply to read data from, or a local copy of the variable. It doesn't necessarily need to change the variable 
+This should be used where the function needs simply to read data from, or to have a local copy of the variable. It doesn't necessarily need to change the variable 
 for a pass-by-value to be valid.
 
 You should pass by value when the variable is less than 8-16 bytes in size. At that point, passing by constant reference becomes a better option unless it's
@@ -105,7 +107,6 @@ useful or required to have a local copy of the variable in the function.
 
 ##### Passing by constant value (don't do this):
 ```c++
-    //syntax for passing by constant value
     void func(const int x);
 ```
 
@@ -116,7 +117,6 @@ copy of the variable, so making the variable constant in the function signature 
 
 ##### Passing by **constant** reference:
 ```c++
-    //syntax for passing by constant reference
     void func(const int& x);
 ```
 
@@ -124,16 +124,13 @@ This should be used when the variable is more than 8-16 bytes in size **AND** fu
 
 Do note that in the case of passing objects by constant reference, a method must be marked const to be callable via the constant reference:
 ```c++
-    //syntax for declaring/defining a method as const
     int get_value() const {
-        //the body of the function cannot change internal state
-        return value
+        return value;
     };
 ```
 
 ##### Passing by pointer:
 ```c++
-    //syntax for passing by pointer
     void func(int* x);
 ```
 
@@ -154,14 +151,30 @@ always spell out "nullptr" when calling the function:
     auto gamepads = get_gamepads();
 ```
 
-I elaborate more as to why this is the case when I talk about passing by mutable reference, so read that if you want to understand why this is the convention.
+Conveniently, Loam also offers the NotNull<T> class, which guarantees that a pointer is not null in debug builds and at compile-time where it can. 
+It's a zero-cost abstraction, basically, as it uses asserts and deleted constructors rather than conditional branches.
 
-###### Always remember to check for nullptr! 
-###### Also, fun fact: C++ compilers are usually smart enough to optimize out checks for nullptr where they can, so there is no reason to not check
+Here's some example usage of NotNull:
+```c++
+    void function(NotNull<int*> n);
+
+    //hard compile-error
+    function(nullptr);
+    //would be caught at runtime
+    int n = 42;
+    int* evil = loam::random_bool(0.5) ? nullptr : &n;
+    function(evil);
+    //works fine because good is not null
+    int* good = &n;
+    function(good);
+```
+
+Anyway, I elaborate more on this when I talk about passing by mutable reference, so read that if you want to understand why passing by pointer 
+is the convention.
+
 
 ##### Passing by **nonconstant/mutable** reference (you should only do this in specific situations):
 ```c++
-    //syntax for passing by nonconstant/mutable reference
     void func(int& x);
 ```
 
@@ -179,11 +192,12 @@ As we've established, parameters should be passed by value or constant reference
     mutative_function(&x);
 ```
 
-This creates that magical stuff called Call-Site-Clarity. At a glance, you can now tell whether a function mutates a value or not.
+This creates magical stuff called **Call-Site-Clarity**. At a glance, you can now tell whether a function mutates a value or not.
 
-The thing about passing by mutable reference is that it ruins that. The syntax for passing by mutable reference looks identical to passing by constant reference and value.
+The thing about passing by mutable reference is that it ruins that. The syntax for passing by mutable reference looks identical to passing by constant reference 
+and value.
 
-Solution? Passing by mutable reference is banned outside of one exception:
+Solution? Passing by mutable reference is banned outside of two exceptions:
 
 ###### Operator overloads
 ```c++
@@ -193,6 +207,14 @@ Solution? Passing by mutable reference is banned outside of one exception:
 
 Operator overloads are made to be ergonomic, and using pointers flies in the face of that, so you're free to use mutable references on an as-needed basis 
 in operator overloads. Still use constant references where you can in operator overloads though.
+
+###### Passing streams into functions
+```c++
+    void print_something(auto something, std::ostream& stream = std::clog);
+```
+
+Because you're not really "mutating" a stream by passing it into a function and using something like std::format or std::print, it's fine to pass by mutable 
+reference to keep it ergonomic.
 
 ###### "But I understand code even when it uses mutable references!"
 
@@ -204,7 +226,6 @@ That said, I must highlight that Google's C++ style guide actually has this same
 
 ##### Passing by **constant** pointer (don't do this in Loam):
 ```c++
-    //syntax for passing by constant pointer
     void func(const int* x);
 ```
 
@@ -260,14 +281,10 @@ While this doesn't apply for all objects; if it's a custom string or container t
 Heap memory is slow to allocate and slow to free. That's a problem in gamedev, where you often need to hit tight frametimes. 
 For that reason, Loam uses stack memory or memory from custom allocators where possible to keep things fast.
 
-###### Note: Loam's current custom allocators include:
-###### Spool - A fixed-size heap array wrapper
-###### Coil - A memory allocator for trivially destructible types
-
 Both the stack and most custom allocators allocate memory by simply moving a pointer. 
 The heap has to talk to the OS to allocate memory, making it orders of magnitude slower.
 
-###### "But wait, don't most objects have to use heap allocations in their constructors? Coil and Spool literally allocate heap memory in their constructors!"
+###### "But wait, don't most objects have to use heap allocations in their constructors?"
 
 Yes, but a good sign you're being responsible with the heap is if the only new and delete calls are in object constructors. 
 Not only does this make your code more memory-safe, it makes heap allocation pauses easier to reason about, as an object, especially a memory 
@@ -331,7 +348,7 @@ For this reason, I find it way harder to actually properly deal with errors when
 ##### 3. In theory, they're a zero-cost abstraction, but they're not in practice
 
 The big assumption I see around exceptions is that it's a zero-cost abstraction if you don't ever throw. While this seems reasonable, 
-and it is technically true *at runtime*, exceptions can actually make your code slower by a significant margin compared to other 
+and it is technically true that *at runtime*, exceptions can actually make your code slower by a significant margin compared to other 
 methods of error handling.
 
 One of the reasons for this is that there's this part of the compiler called the "optimizer," and an optimizer is a serious thing. For 

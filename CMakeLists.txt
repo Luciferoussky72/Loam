@@ -7,18 +7,20 @@ set(CMAKE_CXX_STANDARD 26)
 # Loam relies on SDL3 for rendering, so it refuses to compile without you having it installed
 find_package(SDL3 QUIET)
 if (NOT SDL3_FOUND)
-    message(FATAL_ERROR "Loam requires SDL3. Get it at https://github.com/libsdl-org/SDL")
+    message(FATAL_ERROR "Loam relies on SDL3 for rendering, so it refuses to compile without you having it installed.
+        Get it at https://github.com/libsdl-org/SDL")
 endif()
-# And SDL_mixer for sounds...
+# And Loam relies on SDL_mixer for sounds...
 find_package(SDL3_mixer QUIET)
 if (NOT SDL3_mixer_FOUND)
-    message(FATAL_ERROR "Loam requires SDL3_mixer for audio. Get it at https://github.com/libsdl-org/SDL_mixer")
+    message(FATAL_ERROR "And Loam relies on SDL_mixer for sounds...
+    Get it at https://github.com/libsdl-org/SDL_mixer")
 endif()
 
 # Loam uses Python for compile scripts, although it will still compile without it (for now)
 find_package(Python3 QUIET COMPONENTS Interpreter)
 if (NOT Python3_FOUND)
-    message(WARNING "Python not found; install Python if you want Loam to automatically handle certain parts of compilation")
+    message(WARNING "Python wasn't found, and Loam uses Python for compile scripts, although it will still compile without it (for now)")
 endif()
 
 add_library(Loam STATIC
@@ -43,6 +45,7 @@ add_library(Loam STATIC
         src/Collisions.cpp
         src/Shapes.cpp
         src/Sound.cpp
+        include/loam/Enums.hpp
 )
 
 # Any custom compile commands should go here; be sure to add warnings for each command for if Python wasn't found

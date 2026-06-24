@@ -300,13 +300,7 @@ namespace loam {
              * Compares the objects by their internal pointers' memory addresses
              */
             [[nodiscard]] friend std::strong_ordering operator<=>(const spool_ptr& a, const spool_ptr& b) {
-                return a.raw_ptr <=> b.raw_ptr;
-            }
-            /**
-             * Compares the objects by their internal pointers' memory addresses
-             */
-            [[nodiscard]] friend bool operator==(const spool_ptr& a, const spool_ptr& b) {
-                return a.raw_ptr == b.raw_ptr;
+                return std::compare_three_way{}(a.raw_ptr, b.raw_ptr);
             }
         private:
             T* raw_ptr;
