@@ -317,15 +317,15 @@ namespace loam {
 
 
         //these aliases are here for STL compatibility! You can ignore them otherwise
-        using value_type      = T;
-        using size_type       = std::size_t;
+        using value_type = T;
+        using size_type = std::size_t;
         using difference_type = std::ptrdiff_t;
-        using reference       = T&;
+        using reference = T&;
         using const_reference = const T&;
-        using pointer         = T*;
-        using const_pointer   = const T*;
-        using iterator        = T*;
-        using const_iterator  = const T*;
+        using pointer = T*;
+        using const_pointer = const T*;
+        using iterator = T*;
+        using const_iterator = const T*;
     private:
         T* buffer;
         const size_t capacity;

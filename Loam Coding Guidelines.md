@@ -1,4 +1,4 @@
-## Loam Coding Style Guidelines
+## Loam Coding Guidelines
 
 ### 1. Don't argue about petty style differences
 
@@ -24,27 +24,34 @@ And yet other people write them like this, with no space after the closing paren
     }
 ```
 
-**Let me ask; does it actually matter?** I get that there are some arguments that a certain style is better for readability, but
-**really the debate just boils down the personal preference.**
+Let me ask; does it actually matter? I get that there are some arguments that a certain style is better for readability, but
+really the debate just boils down the personal preference.
 
 The one place it actually does matter is when you have a production library or codebase where consistency is more valuable.
-Thankfully, **that's the kind of problem you can solve in about five minutes with a text-replace tool**.
+Thankfully, that's the kind of problem you can solve in five minutes with a text-replace tool.
 
-Long-story-short, **don't wage wars over petty style differences**. Whether it's The One True Brace Style or something like
-how to declare pointers; **arguing with people over style differences that are really just personal preference is a waste of time**.
+In fact, I would call arguing about petty style guidelines unproductive bikeshedding. Anyone can argue about how to format braces, but it takes actual 
+time and thought to figure out conventions that are actually useful.
 
-### 2. That said, if you're style-agnostic, here are the petty style conventions in Loam:
+Instead of petty style guidelines, Loam's guidelines are focused on "semantic" guidelines. Guidelines that actually help people write code that is clear and 
+correct code. 
 
-#### Note that as Loam is (at the time of writing) mostly developed by me (luciferoussky72), these are my personal style conventions
+If you are interested in working on Loam or just want to learn more about C++ style, you should give this file a read. It is full of ideas borrowed from other 
+languages alongside original guidelines.
 
-##### Curly braces should be on the same line as the statement they're associated with:
+### 2. That said, here are the petty style conventions in Loam:
+### **TO BE CLEAR, YOU DO NOT HAVE TO FOLLOW THESE TO WORK ON LOAM, THIS IS JUST THE STYLE YOU WILL SEE MOST COMMONLY IN LOAM ###
+
+#### Note that because Loam is (at the time of writing) mostly developed by me (luciferoussky72), these are also my personal style conventions
+
+##### Same-line curly braces:
 ```c++
 if (true) {
     do_stuff();
 }
 ```
 
-##### Put a space after if, while, for, do, and requires (in concept definitions), and no space after function names:
+##### One space after if, while, for, do, and requires (in concept definitions), and no space after function names:
 ```c++
 while (x <= 10) {
     x++;
@@ -54,7 +61,7 @@ x = function_call(x);
 void function_declaration();
 ```
 
-##### Declare pointers with the asterisk attached to the type:
+##### Pointers are declared with the asterisk attached to the type:
 ```c++
 int* ptr = &x;
 ```
@@ -65,7 +72,7 @@ Keep in mind that the declarator only applies to the variable it's next to, so y
 int* x, y;
 ```
 
-##### Speaking of... avoid multiple declarations on one line:
+##### Speaking of... multiple declarations on one line are rarely used:
 ```c++
 int x = 50;
 int y = 100;
@@ -76,9 +83,16 @@ is much cleaner and clearer than:
 int x = 50, y = 100;
 ```
 
-##### Declare public members of a class first; they're what the people using the class actually care about:
+The one exception is structured bindings:
+```c++
+//Used in Loam
+auto& [a, b, c] = foo;
+```
 
-###### I don't even know why the AP CS curriculum encourages declaring private members first...
+##### Public members of a class are declared first because they're what the people using the class actually care about:
+
+I don't even know why the AP CS curriculum requires declaring private members first. The whole point of encapsulation is to let you treat classes like 
+black boxes that do things like manage file I/O or format output, so why would you care about the private members?
 ```c++
 class Foo {
 public:
@@ -90,7 +104,7 @@ private:
 
 ### 3. Passing conventions are the weird hill I die on
 
-Okay, maybe it's not a super weird hill (fairy mounds are super weird hills), but this is still something I'm very insistent about.
+Okay, maybe it's not a super weird hill (fairy mounds *are* super weird hills), but this is still something I'm very insistent about.
 
 Basically, C++ gives you a lot of ways to pass variables to functions; which is great; I'm not denying that, but I have some pretty strict ground 
 rules about how to use each, and Loam uses only four of them:
@@ -110,8 +124,9 @@ useful or required to have a local copy of the variable in the function.
     void func(const int x);
 ```
 
-I hate this method of passing variables. It literally does nothing useful. When a variable is passed by value, constant or not, the function already gets a local
-copy of the variable, so making the variable constant in the function signature literally just means that the function cannot modify its local copy.
+I hate this method of passing variables. It literally does nothing useful and is screen clutter. When a variable is passed by value, constant or not, 
+the function already gets a local copy of the variable, so making the variable constant in the function signature literally just means that the function 
+cannot modify its local copy.
 
 **Loam never uses this syntax. You shouldn't either.** (the const-correctness people are squirming now)
 
@@ -120,7 +135,7 @@ copy of the variable, so making the variable constant in the function signature 
     void func(const int& x);
 ```
 
-This should be used when the variable is more than 8-16 bytes in size **AND** function doesn't need a local copy of the variable; just to read data from it.
+This should be used when the variable is more than 8-16 bytes in size **AND** the function doesn't need a local copy of the variable; just to read data from it.
 
 Do note that in the case of passing objects by constant reference, a method must be marked const to be callable via the constant reference:
 ```c++
@@ -181,7 +196,7 @@ is the convention.
 Unlike passing by value, passing by mutable reference means the function gets to modify the original copy of the variable passed to it. Plus, unlike passing by 
 pointer, there's no address-of operator needed! Sounds pretty great! 
 
-Unfortunately, while passing by mutable reference has its uses, I think avoiding it in most situations is a very helpful style choice. 
+Unfortunately, while passing by mutable reference has its uses, I think avoiding it in most situations is a good choice. 
 There's a pretty simple reason for that:
 
 ###### **Call-Site-Clarity**
@@ -218,11 +233,11 @@ reference to keep it ergonomic.
 
 ###### "But I understand code even when it uses mutable references!"
 
-Okay. Cry me a river. Loam does not use mutable references outside of operator overloads. If you don't like the convention, you can always edit your copy of the
-source code.
+Okay. Cry me a river. Loam does not use mutable references outside of operator overloads and passing in streams. 
+
+If you don't like the convention, you can always edit your copy of the source code.
 
 That said, I must highlight that Google's C++ style guide actually has this same convention, so this isn't by any means some esoteric convention exclusive to Loam.
-
 
 ##### Passing by **constant** pointer (don't do this in Loam):
 ```c++
@@ -236,7 +251,7 @@ Because this also breaks the established Call-Site-Clarity conventions, passing 
 
 "But wait!" I hear you say; "What if I need to have a parameter that's immutable AND optional? You can't do that without const pointers!"
 
-Actually, you can (well, 90% of the time).
+Actually, you can (well, you can 95% of the time).
 
 ##### Views!
 
@@ -252,6 +267,7 @@ That's right! Optional parameters!
 
 You can even use default parameters that represent "empty" with them!
 ```c++
+    //"" and {} represent empty strings and spans
     auto generic_function_name(std::string_view view = "", std::span<int> span = {});
 ```
 
@@ -274,7 +290,6 @@ The one catch with std::optional is that it can't store a reference; you're forc
 ##### 2. Give your object a way to be passed in optionally
 
 While this doesn't apply for all objects; if it's a custom string or container type, it should have a .empty function! STL containers do after all!
-
 
 ### 4. Prefer stack and custom-allocated memory over heap memory where possible
 
@@ -316,6 +331,7 @@ if (status) {
 
 cleanup:
 cleanup_stuff();
+//I am aware that this pattern is used for C-style error cleanup, but I'm trying to illustrate using goto instead of normal control flow, not that
 ```
 
 So why is code using exceptions any different?
@@ -332,7 +348,8 @@ if (status) {
 ```
 
 The thing is also that when actually writing code outside of examples, exceptions are a far bigger nightmare than this. When your code 
-uses them, you're constantly calling into functions and potentially causing unbounded jumps all over the call graph.
+uses them, you're constantly calling into functions and potentially causing unbounded jumps all over the call tree, which gets really annoying
+very quickly.
 
 ##### 2. In practice, they actually make error handling *harder*, not easier
 
@@ -374,11 +391,11 @@ return SQRT_TABLE[int(n)] + (n - int(n)) * (SQRT_TABLE[int(n) + 1] - SQRT_TABLE[
 return SQRT_TABLE[flr(n)] + (n - flr(n)) * (SQRT_TABLE[flr(n) + 1] - SQRT_TABLE[flr(n)])
 ```
 
-Optimizer fun facts aside, they also do this thing called "branch prediction." I'll spare you the technical details, but in a nutshell;
-if the compiler can safely assume that a certain code path is more likely to be taken, it can optimize around that assumption.
+Optimizer fun facts aside, they also try and make sure that the final binary is as branch prediction friendly as possible. This means that CPUs will be able to 
+mostly accurately predict where code goes next. I'll spare the details, but suffice it to say that branch prediction friendliness is an important optimization. 
 
-Now, here's the catch; using exceptions absolutely slaughters branch prediction. It stops the compiler from being able to assume that code 
-follows linear execution, so branch prediction has to be a lot more conservative if you use them.
+Now, here's the catch; using exceptions absolutely slaughters branch prediction optimization. It stops the compiler from being able to assume that code 
+follows linear execution, so it has to be a lot more conservative if you use them.
 
 While exceptions aren't zero-cost in other ways, like that they bloat binary size somewhat, the biggest issue is that because they stunt 
 branch prediction, even if your code never throws, you still pay a price, which is especially annoying in gamedev where you want to hit 
@@ -394,7 +411,7 @@ A simple SDL_Log message often works for trivial things that aren't grounds for 
 
 As for why Loam mostly uses SDL_Log instead of something like std::clog or something is that SDL_Log is platform-aware. If the user is on 
 a platform without a proper output terminal, the output from std::clog is not likely to go anywhere useful. Meanwhile, SDL_Log logs to 
-the appropriate logs for the system, such as log files on iOS.
+the appropriate logs for the system, such as the log files on iOS.
 
 ##### 2. Boolean return values
 
@@ -419,7 +436,7 @@ if (!do_stuff_that_might_fail()) {
 ```
 
 This allows you to very easily structure error-resilient code, and if you read Loam's headers, you'll see it all over the place for things 
-like texture loading, file IO, etc.
+like asset loading.
 
 ##### 3. std::expected
 
@@ -436,7 +453,7 @@ uses assert liberally all over the library to catch logic errors that shouldn't 
 like out-of-range on containers because that is really something that should never be happening.
 
 The other great thing about assert is that it goes away entirely in release builds, which is especially great for gamedev where you need 
-code that runs *fast*.
+code that hits a consistent framerate.
 
 
 ### 6. Naming conventions
@@ -460,7 +477,7 @@ the format of "Blank"
 
 ###### 2. Template names can be things other than snake_case. 
 
-If a template represents something generic and simple like any type or enum type, just use T and E respectively. Keeps things concise.
+If a template represents something generic and simple like any type or any enum type, just use T and E respectively. Keeps things concise.
 
 If a template represents a non-bool constant like the capacity of a fixed-size container, use SCREAMING_SNAKE_CASE instead.
 
@@ -470,9 +487,9 @@ I don't think this needs an explanation really; PascalCase for object type names
 
 The one exception is "companion" classes. Things like iterators, handles, and pointers catered to a specific class should use snake_case instead.
 
-##### 3. SCREAMING_SNAKE_CASE for macros and constants, especially global constants
+##### 3. SCREAMING_SNAKE_CASE for constants and MACROS, especially global constants
 
-This is convention and makes it immediately obvious what macros and global constants are
+This is convention and makes it immediately obvious what global constants and MACROS are
 
 ##### Alright, now for actual naming conventions.
 
@@ -491,7 +508,7 @@ Loam also has some conventions for generic variable names that get used for simp
 6. i, j, k, l -> counters (in alphabetical order, although if you go beyond l you may need to question your life choices)
 7. obj -> generic object
 8. raw_ptr -> commonly the name of the member storing the pointer in custom pointer types
-9. lowercase first letter of the type name -> generic object (for example, "const Circle& c")
+9. lowercase first letter of the type name -> generic instance (for example, "const Circle& c")
 10. t -> generic type variable in concepts
 11. os -> generic output stream reference
 12. a, b, c, etc. -> convention for functions and operator overloads that take a few parameters that make sense to represent simply
@@ -507,14 +524,14 @@ functions though:
 This is another Rust-ism that's found its way into Loam. Basically, if a function can cause some weird corruptions if someone uses it incorrectly, you should 
 prefix the name with unsafe_. 
 
-The reasoning is that Loam is meant to be a mostly footgun-free library, so any footguns in Loam should be immediately documented as such. It also comes with the 
+The reasoning is that Loam is meant to be a mostly footgun-free library, so any footguns in Loam should be documented as such. It also comes with the 
 nice pro that finding bugs can sometimes be as easy as grepping for "unsafe."
 
 An example from Loam is as follows:
 
 ```c++
     String& shift_characters_forward(size_t index, size_t shifts) {
-        if (length_ + shifts > CAPACITY) {
+        if (current_length + shifts > CAPACITY) {
             SDL_Log("Tried to shift characters too far forwards in a Loam String! (the shift was a no-op instead of sending your program to The Void of No Return!)");
             return *this;
         }
@@ -522,12 +539,9 @@ An example from Loam is as follows:
     }
 
     String& unsafe_shift_characters_forward(size_t index, size_t shifts) {
-        for (size_t i = 0; i < shifts; ++i) {
-            ++length_;
-            for (size_t j = length_; j > index; --j) {
-                buffer[j] = buffer[j-1];
-            }
-        }
+        std::move_backward(buffer + index, buffer + current_length, buffer + current_length + shifts);
+        current_length += shifts;
+        buffer[current_length] = '\0';
         return *this;
     }
 ```
@@ -547,7 +561,7 @@ like that.
 Operator overloading is a great feature. It actually makes C++ code feel more high-level and expressive than many other languages. That said, there's an elephant 
 in the room I have to address:
 
-## DO NOT USE OPERATOR OVERLOADS TO MEAN THINGS DISCONNECTED FROM THE OPERATOR'S MEANING ##
+## DO NOT USE OPERATOR OVERLOADS TO MEAN THINGS DISCONNECTED FROM THE OPERATOR'S NORMAL MEANING ##
 
 Using operators to mean things disconnected from their normal meanings is where most complaints about operator overloading comes from. It's a problem made worse 
 by other C++ features.

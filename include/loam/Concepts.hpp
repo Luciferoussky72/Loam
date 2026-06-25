@@ -21,9 +21,7 @@ namespace loam {
      * Checks if a type can be sent to output streams
      */
     template <typename T>
-    concept Streamable = requires (T t) {
-        is_streamable<T>;
-    };
+    concept Streamable = is_streamable<T>;
 
     /**
      * Checks if a type can be formatted with std::formatter
@@ -38,9 +36,7 @@ namespace loam {
      * Checks if a type can be formatted with std::formatter
      */
     template <typename T>
-    concept Formattable = requires (T t) {
-        is_formattable<T>;
-    };
+    concept Formattable = is_formattable<T>;
 
     /**
      * Checks if a type supports iterators via begin and end functions
@@ -54,7 +50,17 @@ namespace loam {
      * Checks if a type supports iterators via begin and end functions
      */
     template <typename T>
-    concept Iterable = requires (T t) {
-        is_iterable<T>;
-    };
+    concept Iterable = is_iterable<T>;
+
+    /**
+     * Checks if a type is an enum type
+     */
+    template <typename E>
+    concept is_enum = std::is_enum_v<E>;
+
+    /**
+     * Checks if a type is an enum type
+     */
+    template <typename E>
+    concept Enum = is_enum<E>;
 } // loam

@@ -45,7 +45,7 @@ add_library(Loam STATIC
         src/Collisions.cpp
         src/Shapes.cpp
         src/Sound.cpp
-        include/loam/Enums.hpp
+        include/loam/Hashtable.hpp
 )
 
 # Any custom compile commands should go here; be sure to add warnings for each command for if Python wasn't found
@@ -53,7 +53,7 @@ if (Python3_FOUND)
     add_custom_command(
             TARGET Loam PRE_BUILD
             COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/compile_scripts/loam_hpp_generator.py
-            COMMENT "Auto-generating loam.hpp"
+            COMMENT "Auto-generating loam.hpp based on the headers in include/loam/"
     )
 else()
     message(WARNING "loam.hpp will not be auto-generated. If you've added new headers, run compile_scripts/loam_hpp_generator.py manually")
