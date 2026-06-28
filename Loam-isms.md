@@ -4,7 +4,7 @@
 ### Preface
 Over time, I've developed a bit of my own terminology for writing memorable function comments and technical documentation.
 This document serves to explain those, although you don't strictly need to read this to understand Loam documentation,
-although you'll probably appreciate the references more for reading this!
+you'll probably appreciate the references more for reading this!
 
 ### The References to *Hilda*:
 
