@@ -40,4 +40,5 @@ namespace loam {
     bool point_in_circle(const SDL_FPoint& p, const Circle& circle) {
         return point_in_circle(p.x, p.y, circle);
     }
+
 }

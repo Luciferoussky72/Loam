@@ -45,8 +45,10 @@ namespace loam {
      */
     template <Enum E>
     constexpr std::expected<E, const char*> verify_enum(auto value) {
-        if (string_from_enum(static_cast<E>(value))) {
-            return static_cast<E>(value);
+        template for (constexpr auto e : std::define_static_array(std::meta::enumerators_of(^^E))) {
+            if ([:e:] == static_cast<E>(value)) {
+                return static_cast<E>(value);
+            }
         }
         return std::unexpected("Couldn't find the enum value!");
     }

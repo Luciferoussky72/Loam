@@ -55,11 +55,13 @@ namespace loam {
         return *this;
     }
     Vec2 operator/(const Vec2& a, float n) {
-        return Vec2{a.x / n, a.y / n};
+        float inverse = 1.0f / n;
+        return Vec2{a.x * inverse, a.y * inverse};
     }
     Vec2& Vec2::operator/=(float n) {
-        x /= n;
-        y /= n;
+        float inverse = 1.0f / n;
+        x *= inverse;
+        y *= inverse;
         return *this;
     }
 
@@ -71,4 +73,4 @@ namespace loam {
         return SDL_FPoint{x, y};
     }
 
-} // loam
+}

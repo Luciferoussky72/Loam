@@ -100,12 +100,14 @@ namespace loam {
      * Pushes debug UI for a class instance to a new ImGui window
      * @tparam T the type to log
      * @param instance the instance of T to log
+     * @param window_lifetime a pointer to the bool that controls when the window closes
+     * @param window_flags the flags the window should use
      * @return true on success, false on failure
      */
     template <typename T>
-    requires std::is_aggregate_v<T>
-    bool generate_class_debug_ui(const T& instance) {
-        ImGui::Begin(std::meta::identifier_of(^^T));
+    requires std::is_class_v<T>
+    bool generate_class_debug_ui(const T& instance, bool* window_lifetime, ImGuiWindowFlags window_flags) {
+        ImGui::Begin(std::meta::identifier_of(^^T).data(), window_lifetime, window_flags);
 
         static constexpr auto members = std::define_static_array(
             std::meta::nonstatic_data_members_of(^^T, std::meta::access_context::unchecked())
@@ -125,5 +127,5 @@ namespace loam {
 
         return true;
     }
-} // loam
+}
 

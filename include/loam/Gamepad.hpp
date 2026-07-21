@@ -12,7 +12,7 @@ namespace loam {
     class Gamepad;
 
     /**
-     * A free function made for probing for new gamepad connections
+     * Probes for new gamepad connections
      * @warning should only be called once per frame/update cycle; calling this multiple times will
      * cause a gamepad to be claimed twice, sending your program into The Void of No Return! (that last part may not be true)
      * @return an instance of std::optional<Gamepad> for instantiating a new gamepad
@@ -26,6 +26,12 @@ namespace loam {
          * @param gamepad a pointer to the SDL_Gamepad to build the object from
          */
         Gamepad(SDL_Gamepad* gamepad);
+
+        Gamepad(const Gamepad&) = delete("Copying a Gamepad would mean copying its pointer, sending the program to The Void of No Return!");
+        Gamepad& operator=(const Gamepad&) = delete("Copy-assigning a Gamepad would mean copying its pointer, sending the program to The Void of No Return!");
+
+        Gamepad(Gamepad&& other) noexcept;
+        Gamepad& operator=(Gamepad&& other) noexcept;
 
         /**
          * Frees the instance's gamepad
@@ -72,13 +78,8 @@ namespace loam {
          */
         [[nodiscard]] float get_gamepad_axis(SDL_GamepadAxis axis, float deadzone = 0.15f) const;
     private:
-        SDL_Gamepad* gamepad;
-        bool current_gamepad_buttons[SDL_GAMEPAD_BUTTON_COUNT]{};
-        bool previous_gamepad_buttons[SDL_GAMEPAD_BUTTON_COUNT]{};
+        SDL_Gamepad* gamepad_pointer;
+        bool current_gamepad_buttons[SDL_GAMEPAD_BUTTON_COUNT] = {false};
+        bool previous_gamepad_buttons[SDL_GAMEPAD_BUTTON_COUNT] = {false};
     };
-
-
-
-
-
-} // loam
+}

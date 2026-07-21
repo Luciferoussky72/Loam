@@ -7,8 +7,8 @@ namespace loam {
     }
 
     std::string Circle::equation() const {
-        std::stringstream ss;
-        ss << "(x - " << center_x << ")^2 + (y - " << center_y << ")^2 = " << radius << "^2";
-        return ss.str();
+        std::string tmp;
+        std::format_to(std::back_inserter(tmp), "(x - {})^2 + (y - {})^2 = {}^2", center_x, center_y, radius);
+        return tmp;
     }
 }

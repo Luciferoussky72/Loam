@@ -6,9 +6,9 @@
 
 namespace loam {
     /**
-     * Error function to get around the fact that we can't throw exceptions in a consteval context, so Loam just uses runtime functions instead
+     * Error function to get around the fact that we can't throw exceptions, so Loam just uses runtime functions instead
      */
-    inline void error_enum_type_incompatible_with_loam_hashtable() {};
+    inline void error_enum_type_incompatible_with_loam_enumtable() {};
 
     /**
      * Simulates perfect hashing without complex algorithms or any wasted space by using enums and C++26 reflection
@@ -16,38 +16,49 @@ namespace loam {
      * @note funny story; I was trying to write a perfect hashing algorithm before this. One night, when I was trying to fall asleep for an early flight
      * the next day; the idea of using enums + reflection instead came to me and I immediately wrote the idea down, then was out like a light and
      * implemented and documented this during the flight
-     * @tparam T the type that the Hashtable will store
-     * @tparam E the enum type that defines valid keys for the hashtable; must have its members count up from 0
+     * @tparam T the type that the Enumtable will store
+     * @tparam E the enum type that defines valid keys for the table; must have its members count up from 0
      */
     template <typename T, Enum E>
-    class Hashtable {
+    class Enumtable {
     public:
         /**
          * Just runs the verify_enum function to make sure that the enum is valid to use for indexing
          * @note what's cool is that this constructor has zero cost at runtime; verify_enum is 100% compile-time
          */
-        constexpr Hashtable() {
+        constexpr Enumtable() {
             verify_enum();
         }
 
         /**
-         * Initializes a Hashtable based on an initializer list
+         * Uniformly initializes the table
+         * @param uniform the value to uniformly initialize the table with
+         */
+        constexpr Enumtable(T uniform) {
+            verify_enum();
+            for (T& t : table) {
+                t = uniform;
+            }
+        }
+
+        /**
+         * Initializes an Enumtable based on an initializer list
          * @warning you'll get a crash if you use a list that's too long in a debug build, but the list will be truncated in release builds
          * @param list the list to use (that much should be clear lol)
          */
-        constexpr Hashtable(std::initializer_list<T> list) {
+        constexpr Enumtable(std::initializer_list<T> list) {
             verify_enum();
-            assert(list.size() <= table.size() && "Tried to initialize a Loam Hashtable with a list that was too long!");
+            assert(list.size() <= table.size() && "Tried to initialize a Loam Enumtable with a list that was too long!");
             table = list;
         }
         /**
-         * Assigns a Hashtable to values in an initializer list
+         * Assigns an Enumtable to values in an initializer list
          * @warning you'll get a crash if you assign to a list that's too long in a debug build, but the list will be truncated in release builds
          * @param list the list to use (surprising, I know)
          * @return a reference to the object to enable chaining
          */
-        constexpr Hashtable& operator=(std::initializer_list<T> list) {
-            assert(list.size() <= table.size() && "Tried to assign a Loam Hashtable to a list that was too long!");
+        constexpr Enumtable& operator=(std::initializer_list<T> list) {
+            assert(list.size() <= table.size() && "Tried to assign a Loam Enumtable to a list that was too long!");
             table = list;
             return *this;
         }
@@ -56,24 +67,24 @@ namespace loam {
          * Copies all values from one table to another
          * @param other the table to copy from
          */
-        constexpr Hashtable(const Hashtable& other) {
-            std::copy(other.table.begin(), other.table.end(), table);
+        constexpr Enumtable(const Enumtable& other) {
+            std::copy(other.table.begin(), other.table.end(), table.begin());
         }
         /**
          * Copies all values from one table to another
          * @param other the table to copy from
          * @return a reference to the copied-to table to enable chaining
          */
-        constexpr Hashtable& operator=(const Hashtable& other) {
-            std::copy(other.table.begin(), other.table.end(), table);
+        constexpr Enumtable& operator=(const Enumtable& other) {
+            std::copy(other.table.begin(), other.table.end(), table.begin());
             return *this;
         }
         /**
          * Move-assigns all values from one table to the another
          * @param other the table to move from
          */
-        constexpr Hashtable(Hashtable&& other) noexcept {
-            for (int i = 0; i < table.size(); ++i) {
+        constexpr Enumtable(Enumtable&& other) noexcept {
+            for (size_t i = 0; i < table.size(); ++i) {
                 table[i] = std::move(other.table[i]);
             }
         }
@@ -82,8 +93,8 @@ namespace loam {
          * @param other the table to move from
          * @return a reference to the moved-to table to enable chaining
          */
-        constexpr Hashtable& operator=(Hashtable&& other) noexcept {
-            for (int i = 0; i < table.size(); ++i) {
+        constexpr Enumtable& operator=(Enumtable&& other) noexcept {
+            for (size_t i = 0; i < table.size(); ++i) {
                 table[i] = std::move(other.table[i]);
             }
             return *this;
@@ -97,7 +108,7 @@ namespace loam {
             size_t n = 0;
             for (constexpr std::meta::info e : std::define_static_array(std::meta::enumerators_of(^^E))) {
                 if (n != static_cast<size_t>([:e:])) {
-                    error_enum_type_incompatible_with_loam_hashtable();
+                    error_enum_type_incompatible_with_loam_enumtable();
                 }
                 ++n;
             }
@@ -123,13 +134,34 @@ namespace loam {
         }
 
         /**
+         * You can also access values by using raw enumerators!
+         * @warning unchecked, like operator[] overloads in the STL; be careful if you don't want to end up with Tide Mice.
+         * @param enumerator the enumerator to use
+         * @return a reference to the element attached to the enumerator
+         */
+        [[nodiscard]] constexpr T& operator[](E enumerator) {
+            return table[static_cast<size_t>(enumerator)];
+        }
+
+        /**
+         * You can also access values by using raw enumerators!
+         * @warning unchecked, like operator[] overloads in the STL; be careful if you don't want to end up with Tide Mice.
+         * @param enumerator the enumerator to use
+         * @return a constant reference to the element attached to the enumerator
+         */
+        [[nodiscard]] constexpr const T& operator[](E enumerator) const {
+            return table[static_cast<size_t>(enumerator)];
+        }
+
+
+        /**
          * Gets the value that matches the key
          * @param key the key to use; make sure it matches the enum names!
          * @return a reference to the element attached to the key
          */
         [[nodiscard]] constexpr T& at(std::string_view key) {
             std::expected<E, const char*> probably_has_value = enum_from_string<E>(key);
-            assert(probably_has_value.has_value() && "Tried to access a Loam Hashtable value with an invalid key; summoning Tide Mice into the program!");
+            assert(probably_has_value.has_value() && "Tried to access a Loam Enumtable value with an invalid key; summoning Tide Mice into the program!");
             return table[static_cast<size_t>(probably_has_value.value())];
         }
 
@@ -140,14 +172,39 @@ namespace loam {
          */
         [[nodiscard]] constexpr const T& at(std::string_view key) const {
             std::expected<E, const char*> probably_has_value = enum_from_string<E>(key);
-            assert(probably_has_value.has_value() && "Tried to access a Loam Hashtable value with an invalid key; summoning Tide Mice into the program!");
+            assert(probably_has_value.has_value() && "Tried to access a Loam Enumtable value with an invalid key; summoning Tide Mice into the program!");
             return table[static_cast<size_t>(probably_has_value.value())];
         }
 
+        /**
+         * You can also access values by using raw enumerators!
+         * @param enumerator the enumerator to use
+         * @return a reference to the element attached to the enumerator if the enumerator is valid
+         */
+        [[nodiscard]] constexpr T& at(E enumerator) {
+            template for (constexpr auto e : std::define_static_array(std::meta::enumerators_of(^^E))) {
+                if (enumerator == [:e:]) {
+                    return table[static_cast<size_t>(enumerator)];
+                }
+            }
+            assert(!"Tried to access a Loam Enumtable value with an invalid enumerator; summoning Tide Mice into the program!");
+            return table[static_cast<size_t>(enumerator)];
+        }
 
-
-
-
+        /**
+         * You can also access values by using raw enumerators!
+         * @param enumerator the enumerator to use
+         * @return a constant reference to the element attached to the enumerator if the enumerator is valid
+         */
+        [[nodiscard]] constexpr const T& at(E enumerator) const {
+            template for (constexpr auto e : std::define_static_array(std::meta::enumerators_of(^^E))) {
+                if (enumerator == [:e:]) {
+                    return table[static_cast<size_t>(enumerator)];
+                }
+            }
+            assert(!"Tried to access a Loam Enumtable value with an invalid enumerator; summoning Tide Mice into the program!");
+            return table[static_cast<size_t>(enumerator)];
+        }
 
         //aliases for STL compatibility; ignore these otherwise
         using value_type = T;

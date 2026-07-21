@@ -23,8 +23,4 @@ namespace loam {
     Uint64 Timer::get_stop_time() const {
         return stop_time;
     }
-
-
-
-
-} // loam
+}

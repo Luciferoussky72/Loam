@@ -52,4 +52,4 @@ namespace loam {
         return !(current_mouse_state & SDL_BUTTON_MASK(static_cast<uint>(button))) and
                (previous_mouse_state & SDL_BUTTON_MASK(static_cast<uint>(button)));
     }
-} // loam
+}

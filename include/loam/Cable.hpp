@@ -6,10 +6,11 @@
 #include <algorithm>
 
 #include <SDL3/SDL_log.h>
+#include <loam/NotNull.hpp>
 
 namespace loam {
     /**
-     * A more simplistic wrapper for heap arrays than Spool
+     * A more simplistic wrapper for heap arrays than Spool or std::vector
      * @note this basically just adds some basic safety and stuff over a heap array; there are no push semantics or anything really
      */
     template <typename T>
@@ -48,14 +49,33 @@ namespace loam {
         }
 
         /**
+         * Reallocates a Cable
+         * @param n the number of elements to reallocate to
+         * @return true if it successfully reallocates, false otherwise
+         */
+        [[nodiscard]] bool reallocate(size_t n) {
+            T* new_buffer = new (std::nothrow) T[n];
+            if (!new_buffer) {
+                SDL_Log("A Loam Cable's buffer was unable to reallocate properly! Be careful lest you want to throw your program into The Void of No Return!");
+                return false;
+            }
+            std::copy(cbegin(), cend(), new_buffer);
+
+            if (buffer) {
+                delete[] buffer;
+            }
+
+            buffer = new_buffer;
+            capacity = n;
+            return true;
+        }
+
+        /**
          * Copies all the data from another Cable
          * @param other the Cable to copy from
          */
         Cable(const Cable& other) : capacity(other.capacity) {
             assert(other.buffer && "Tried to copy-construct a null Loam Cable!");
-            if (buffer) {
-                delete[] buffer;
-            }
             buffer = new (std::nothrow) T[other.capacity];
             if (!buffer) {
                 SDL_Log("A Loam Cable's buffer was unable to allocate properly! Be careful lest you want to throw your program into The Void of No Return!");
@@ -87,10 +107,7 @@ namespace loam {
          * @param other the Cable to move from
          */
         Cable(Cable&& other) noexcept : capacity(other.capacity) {
-            assert(other.good() && "Tried to move-construct a null Loam Cable!");
-            if (buffer) {
-                delete[] buffer;
-            }
+            assert(other.good() && "Tried to move-construct from a null Loam Cable!");
             other.capacity = 0;
             buffer = other.buffer;
             other.buffer = nullptr;
@@ -102,7 +119,7 @@ namespace loam {
          * @return a reference to the moved-to Cable to enable chaining
          */
         Cable& operator=(Cable&& other) noexcept {
-            assert(other.buffer && "Tried to move-assign a null Loam Cable!");
+            assert(other.buffer && "Tried to move-assign from a null Loam Cable!");
             if (buffer) {
                 delete[] buffer;
             }
@@ -168,20 +185,24 @@ namespace loam {
         }
 
         /**
-         *
-         * @param n
-         * @return
+         * Gets the nth element
+         * @param n the element to get (i mean, i already told you that)
+         * @return a reference to the nth element
          */
         [[nodiscard]] T& at(size_t n) {
             assert(n < capacity && "Tried to poke an out-of-bounds Cable index, which would send your program to The Void of No Return!");
             return buffer[n];
         }
+        /**
+         * Gets the nth element
+         * @param n the element to get (i mean, i already said that)
+         * @return a constant reference to the nth element
+         */
         [[nodiscard]] const T& at(size_t n) const {
             assert(n < capacity && "Tried to read an out-of-bounds Cable index, which would send your program to The Void of No Return!");
             return buffer[n];
         }
-
-
+        
         //aliases for STL compatibility; ignore these otherwise
         using value_type = T;
         using size_type = std::size_t;

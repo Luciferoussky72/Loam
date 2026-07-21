@@ -98,4 +98,4 @@ namespace loam {
         const bool* current_key_state;
         bool previous_key_state[SDL_SCANCODE_COUNT] = {false};
     };
-} // loam
+}

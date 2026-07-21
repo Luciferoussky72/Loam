@@ -136,7 +136,7 @@ namespace loam {
         float x = 0;
         float y = 0;
     };
-} // loam
+}
 
 /**
  * A specialization of std::formatter so you can use Loam vectors with modern std::print!

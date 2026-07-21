@@ -23,7 +23,7 @@ if (NOT Python3_FOUND)
     message(WARNING "Python wasn't found, and Loam uses Python for compile scripts, although it will still compile without it (for now)")
 endif()
 
-add_library(Loam STATIC
+add_library(loam STATIC
         # ImGui stuff, as Loam uses ImGui's SDL implementation for debug UI
         libraries/imgui/imgui.cpp
         libraries/imgui/imgui_draw.cpp
@@ -34,24 +34,22 @@ add_library(Loam STATIC
         libraries/imgui/backends/imgui_impl_sdlgpu3.cpp
 
         # Actual Loam stuff
-        src/Engine.cpp
         src/Gamepad.cpp
         src/Loader.cpp
         src/Random.cpp
-        src/Spritesheet.cpp
+        src/Sprites.cpp
         src/Timing.cpp
         src/KeyboardMouse.cpp
         src/Vec2.cpp
         src/Collisions.cpp
         src/Shapes.cpp
         src/Sound.cpp
-        include/loam/Hashtable.hpp
 )
 
 # Any custom compile commands should go here; be sure to add warnings for each command for if Python wasn't found
 if (Python3_FOUND)
     add_custom_command(
-            TARGET Loam PRE_BUILD
+            TARGET loam PRE_BUILD
             COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/compile_scripts/loam_hpp_generator.py
             COMMENT "Auto-generating loam.hpp based on the headers in include/loam/"
     )
@@ -61,7 +59,7 @@ endif()
 
 # end custom compile commands
 
-target_compile_options(Loam PRIVATE
+target_compile_options(loam PRIVATE
         # Set the STL to the C++26 STL
         -std=c++26
         # Turn on reflection (has no runtime cost, thankfully, but we still need to tell the compiler to turn it on)
@@ -77,10 +75,10 @@ target_compile_options(Loam PRIVATE
         $<$<CONFIG:Release>: -O2>
 )
 
-target_include_directories(Loam PUBLIC include/)
-target_include_directories(Loam PUBLIC "libraries/")
-target_include_directories(Loam PUBLIC "libraries/imgui/")
-target_include_directories(Loam PUBLIC "libraries/imgui/backends/")
-target_include_directories(Loam PUBLIC "libraries/tomlplusplus/")
+target_include_directories(loam PUBLIC include/)
+target_include_directories(loam PUBLIC "libraries/")
+target_include_directories(loam PUBLIC "libraries/imgui/")
+target_include_directories(loam PUBLIC "libraries/imgui/backends/")
+target_include_directories(loam PUBLIC "libraries/tomlplusplus/")
 
-target_link_libraries(Loam PUBLIC SDL3::SDL3 SDL3_mixer::SDL3_mixer)
+target_link_libraries(loam PUBLIC SDL3::SDL3 SDL3_mixer::SDL3_mixer)

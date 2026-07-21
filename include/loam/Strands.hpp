@@ -31,7 +31,7 @@ namespace loam {
          * @param elements the number of elements that the allocator will be able to allocate
          */
         [[nodiscard]] Strands(size_t elements) {
-            memory = static_cast<ElementUnion*>(operator new(sizeof(ElementUnion) * elements, std::nothrow));
+            memory = static_cast<ElementUnion*>(operator new(sizeof(ElementUnion) * elements, static_cast<std::align_val_t>(alignof(ElementUnion)), std::nothrow));
             if (!memory) {
                 SDL_Log("failed to allocate a Strands allocator's buffer!");
                 return;
@@ -58,7 +58,7 @@ namespace loam {
          * Frees the allocator's memory
          */
         ~Strands() {
-            operator delete(memory);
+            operator delete(memory, num_elements * sizeof(ElementUnion));
         }
 
         Strands(const Strands&) = delete("Copying a Strands allocator would send your program to The Void of No Return!");
@@ -89,7 +89,7 @@ namespace loam {
          * Fetches a pointer from the allocator
          * @note make sure to not let the pointer go out of scope, otherwise you will
          * be unable to free the pointer
-         * @return the pointer to the allocator's memory, or nullptr if the allocator is out of memory
+         * @return a pointer to the allocator's memory, or nullptr if the allocator is out of memory
          */
         [[nodiscard]] T* alloc() {
             assert(head && "Strands allocator ran out of memory!");
@@ -98,6 +98,22 @@ namespace loam {
             ElementUnion* tmp = reinterpret_cast<ElementUnion*>(head);
             head = head->next;
             return &tmp->element;
+        }
+
+        /**
+         * Fetches a pointer from the allocator and constructs an object in that location
+         * @param args the arguments to pass to the constructor
+         * @note make sure to not let the pointer go out of scope, otherwise you will
+         * be unable to free the pointer
+         * @return an initialized pointer to the allocator's memory, or nullptr if the allocator is out of memory
+         */
+        template <typename... Args>
+        [[nodiscard]] T* construct_alloc(Args&& ...args) {
+            T* tmp = alloc();
+            if (!tmp) return nullptr;
+
+            new (tmp) T(std::forward<Args>(args)...);
+            return tmp;
         }
 
         /**
@@ -187,10 +203,15 @@ namespace loam {
             /**
              * Move-assigns a strand_ptr
              * @param other the strand_ptr to move from
-             * @return the moved_from pointer is invalidated; dereferencing it will send your program to The Void of No Return!
+             * @warning the moved-from pointer is invalidated; dereferencing it will send your program to The Void of No Return!
+             * @warning the moved-to pointer has its memory freed if it's currently pointing to something
+             * @return a reference to the object to enable chaining
              */
             strand_ptr& operator=(strand_ptr&& other) noexcept {
                 if (this == &other) return *this;
+
+                free();
+
                 raw_ptr = other.raw_ptr;
                 other.raw_ptr = nullptr;
                 parent = other.parent;

@@ -68,6 +68,4 @@ namespace loam {
      * @return whether the point falls within the circle
      */
     bool point_in_circle(const SDL_FPoint& p, const Circle& circle);
-
-
 }

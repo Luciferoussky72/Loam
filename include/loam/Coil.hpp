@@ -235,5 +235,5 @@ namespace loam {
 
         size_t num_unwinds_parent_at_creation;
     };
-} // loam
+}
 

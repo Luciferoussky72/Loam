@@ -54,5 +54,5 @@ namespace loam {
         Uint64 delta_ms = 0;
 
     };
-} // loam
+}
 

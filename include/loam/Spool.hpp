@@ -333,4 +333,4 @@ namespace loam {
 
         size_t generation = 0;
     };
-} // loam
+}

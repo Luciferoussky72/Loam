@@ -6,28 +6,21 @@
 #include <algorithm>
 #include <cassert>
 #include <compare>
+#include <format>
 #include <SDL3/SDL_log.h>
 
 namespace loam {
     /**
      * A stack-allocated, fixed-size string type so you can get (mostly) safe string abstraction without the slowness of the heap
      * @author luciferoussky72
-     * @note because of the UNTOUCHABLE_NULL_TERMINATOR member, a C API is unable to breeze past the string's actual null terminator and read garbage data!
-     * @tparam CAPACITY the max number of characters the string can store
+     * @tparam CAPACITY the max number of characters the string can store; defaults to 255
      */
-    template <size_t CAPACITY = 256>
+    template <size_t CAPACITY = 255>
     class String {
     public:
         /**
-         * Checks that the string is properly null-terminated
-         * @return true if the string is null-terminated, false otherwise
-         */
-        [[nodiscard]] bool sanity_check() const {
-            return buffer[current_length] == '\0';
-        }
-
-        /**
          * Constructs a String based on a string_view
+         * @note a string_view captures string literals, std::strings, etc
          * @param view the view to use
          */
         String(std::string_view view) {
@@ -55,6 +48,14 @@ namespace loam {
          */
         String& operator=(std::string_view view) {
             return assign(view);
+        }
+
+        /**
+         * Checks that the string is properly null-terminated
+         * @return true if the string is null-terminated, false otherwise
+         */
+        [[nodiscard]] bool sanity_check() const {
+            return buffer[current_length] == '\0';
         }
 
         /**
@@ -475,8 +476,19 @@ namespace loam {
         }
 
     private:
-        //1 extra for the null-terminator and the guarantee that buffer[CAPACITY] is valid
         char buffer[CAPACITY + 1] = {};
         size_t current_length;
     };
 }
+
+
+/**
+ * std::formatter specialization so you can use Loam Strings with std::print!
+ * @note inheriting from std::string_view is the ultimate cheat code for this lol
+ */
+template <size_t CAPACITY>
+struct std::formatter<loam::String<CAPACITY>> : std::formatter<std::string_view> {
+    auto format(const loam::String<CAPACITY>& string, std::format_context& context) const {
+        return std::formatter<std::string_view>::format(std::string_view(string), context);
+    }
+};

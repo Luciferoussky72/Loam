@@ -19,6 +19,8 @@ Loam has a few guiding tenets driving much of the design behind the API:
 Modern C++, especially since C++20, has released lots of incredibly powerful modern features. We got concepts in C++20; things like std::expected in C++23, and 
 then reflection (which is absurdly powerful and renders so much hacky preprocessor abuse obsolete) in C++26.
 
+Loam completely embraces modern C++ patterns to keep the API usable, modern, and cutting-edge.
+
 If you're interested in learning more about Loam's guidelines, read "Loam Coding Style Guidelines.md"
 
 ##### 2. Keep-It-Simple principles
@@ -39,8 +41,8 @@ int main() {
 }
 ```
 
-The above code is doing something pretty cool, actually, but nobody except the nerd who wrote it (which was me... ...it was as an example, I don't normally 
-write code like that lol) understands what is happening, so nobody wants to use or interact with this code. 
+The above code is doing something pretty cool, actually, but nobody except the nerd who wrote it (which was me, although I don't normally write code like that 
+lol) understands what is happening, so nobody wants to use or interact with this code. 
 
 Really; what's worse than nobody using your API because it's too badly-written to understand?
 
@@ -49,7 +51,7 @@ For this reason, Loam is built on Keep-It-Simple principles. Loam APIs are desig
 ##### 3. Safety in a Spartan language
 
 I call C++ a "Spartan" language because it's a language that really doesn't hold your hand. You are constantly at the mercy of undefined behaviour, causing a 
-segfault, corrupting the heap; there are lots of ways you can end up with a bad day in C++.
+segfault, corrupting the heap; suffice it to say there are lots of ways you can end up with a bad day in C++.
 
 Loam is meant to be an "oasis in that wasteland," and accomplishes this with style guidelines, insistence on modern best practices, and even comes with safe 
 wrappers like loam::NotNull for pointers, which guarantees in a that a pointer will never be null in a debug build but compiles down to raw pointer access in 
@@ -86,9 +88,21 @@ a more detailed explanation as to why Loam avoids them.
 Loam makes use of (at least currently) very new features like reflection. This means that Loam might not work at all if you're stuck with a compiler that hasn't 
 caught up to C++26.
 
-Thankfully, you can avoid this problem by just not including headers that use reflection syntax. Reflection is
+Thankfully, you can avoid this problem by just not including headers that use reflection syntax. Reflection is header-only in Loam. (at least at the moment, please
+correct this if that changes)
 
-##### 4. Loam is full of silly comments and fun references to Hilda to keep things lively
+##### 4. Loam is not built to be thread-safe
+
+The rationale for this is because Loam is an indie-focused game library, and most indie games should run completely fine single-threaded, there's really no need 
+to make Loam thread-safe. 
+
+In fact, there are good arguments against making a library like Loam thread-safe. First of all, it would seriously complicate the API and codebase for something 
+maybe 1% of users would use. Two, games, especially indie games, can actually run better single-threaded. The reason for this is that a compiler is usually able 
+to better optimize code when it's single-threaded because it's then able to freely reorder and vectorize instructions.
+
+However, if you absolutely need to write an asynchronous codebase, keep in mind that Loam is not a library designed for that, so it might not be for you.
+
+##### 5. Loam is full of silly comments and fun references to Hilda to keep things lively
 
 This one's just a quirk, not a limitation.
 
@@ -110,9 +124,9 @@ file_data read_from(std::fstream file);
 It's boring, you barely remember it, and you can feel your brain starting to seep out of your ears because you have no idea what an "RXQV-3000" test is.
 
 Loam is meant to be the antithesis to boring documentation like that. In fact, there's a whole document dedicated to what various references to things like 
-*Hilda* mean in the context of Loam code. For example, a "Time Worm" means data getting eaten by multithreading o
+*Hilda* mean in the context of Loam code. For example, a "Time Worm" means data getting eaten by multithreading or being careless with data. 
 
-For example, here's the same function with a function comment like the ones in Loam:
+Here's the same function with a function comment like the ones in Loam:
 
 ```c++
 /**
@@ -131,4 +145,12 @@ One of the biggest pros of writing documentation like this, actually, is that pe
 far better than "undefined behaviour", after all.
 
 Despite all of that, if you are a gloomy person who eats dry oatmeal for breakfast and hates fun, Loam may not be the library for you. I am sorry.
+
+### Contributing
+
+If you want to help write code for Loam, you should read Loam Coding Guidelines.md and Loam-isms.md to help you get started. Those walk you through the coding 
+style guidelines and the various metaphors used within Loam. 
+
+From there, keep in mind that Loam's scope is strictly non-mandating. Any pull requests that contain something like an entity or scene management system will 
+not be accepted. Something like that should be up to developers, not Loam.
 

@@ -81,4 +81,4 @@ namespace loam {
 
     //Make sure that the class is trivially copyable
     static_assert(std::is_trivially_copyable_v<NotNull<int*>>);
-} // loam
+}

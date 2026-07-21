@@ -25,26 +25,24 @@ namespace loam {
 
     /**
      * Checks if a type can be formatted with std::formatter
+     * @note only works with char, but the assumption would be that most output uses that
      */
     template <typename T>
-    concept is_formattable = requires (T t) {
-        std::formatter<T>{}(t);
-        std::formatter<T>::parse;
-        std::formatter<T>::format;
-    };
+    concept is_formattable = std::formattable<std::remove_cvref_t<T>, char>;
     /**
      * Checks if a type can be formatted with std::formatter
+     * @note only works with char, but the assumption would be that most output uses that
      */
     template <typename T>
-    concept Formattable = is_formattable<T>;
+    concept Formattable = is_formattable<std::remove_cvref_t<T>>;
 
     /**
      * Checks if a type supports iterators via begin and end functions
      */
     template <typename T>
-    concept is_iterable = requires (T t) {
-        std::begin(t);
-        std::end(t);
+    concept is_iterable = requires (std::remove_cvref_t<T> t) {
+        std::cbegin(t);
+        std::cend(t);
     };
     /**
      * Checks if a type supports iterators via begin and end functions
@@ -63,4 +61,16 @@ namespace loam {
      */
     template <typename E>
     concept Enum = is_enum<E>;
-} // loam
+
+    /**
+     * Checks if a type is an array type
+     */
+    template <typename T>
+    concept is_array = std::is_array_v<T>;
+
+    /**
+     * Checks if a type is an array type
+     */
+    template <typename T>
+    concept Array = is_array<T>;
+}
