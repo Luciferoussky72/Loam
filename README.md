@@ -54,7 +54,7 @@ I call C++ a "Spartan" language because it's a language that really doesn't hold
 segfault, corrupting the heap; suffice it to say there are lots of ways you can end up with a bad day in C++.
 
 Loam is meant to be an "oasis in that wasteland," and accomplishes this with style guidelines, insistence on modern best practices, and even comes with safe 
-wrappers like loam::NotNull for pointers, which guarantees in a that a pointer will never be null in a debug build but compiles down to raw pointer access in 
+wrappers like loam::NotNull for pointers, which guarantees that a pointer will never be null in a debug build but compiles down to raw pointer access in 
 release builds!
 
 ### Quirks and Limitations of Loam
