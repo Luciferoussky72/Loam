@@ -4,6 +4,8 @@
 #include <SDL3/SDL_render.h>
 #include <SDL3_image/SDL_image.h>
 
+#include "Spritesheet.hpp"
+
 namespace loam {
     template <Enum TE>
     class Loader {
@@ -107,7 +109,20 @@ namespace loam {
             for (SDL_Texture* t : texture_storage) {
                 if (texture == t) return true;
             }
-            return true;
+            return false;
+        }
+
+        /**
+         * Checks that the Loader has a specific Spritesheet's texture
+         * @note you'd use this to verify that a Spritesheet's SDL_Texture* isn't a dangling pointer
+         * @param spritesheet the Spritesheet to check for the texture
+         * @return true if it has the Spritesheet's texture, false otherwise
+         */
+        [[nodiscard]] bool has(const Spritesheet& spritesheet) {
+            for (SDL_Texture* t : texture_storage) {
+                if (spritesheet.texture == t) return true;
+            }
+            return false;
         }
     private:
         SDL_Renderer* renderer = nullptr;
