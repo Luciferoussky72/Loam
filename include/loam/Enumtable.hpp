@@ -8,7 +8,7 @@ namespace loam {
     /**
      * Error function to get around the fact that we can't throw exceptions, so Loam just uses runtime functions instead
      */
-    inline void error_enum_type_incompatible_with_loam_enumtable() {};
+    inline void error_enum_type_incompatible_with_loam_enumtable() {}
 
     /**
      * Simulates perfect hashing without complex algorithms or any wasted space by using enums and C++26 reflection
@@ -104,7 +104,7 @@ namespace loam {
          * Verifies that the enum type counts up from 0 to the number of members in the enum
          * @return true if the enum qualifies, false otherwise
          */
-        consteval void verify_enum() {
+        consteval void verify_enum() const {
             size_t n = 0;
             for (constexpr std::meta::info e : std::define_static_array(std::meta::enumerators_of(^^E))) {
                 if (n != static_cast<size_t>([:e:])) {
@@ -206,6 +206,32 @@ namespace loam {
             return table[static_cast<size_t>(enumerator)];
         }
 
+        /**
+         * Begin iterator function
+         */
+        [[nodiscard]] constexpr T* begin() {
+            return table;
+        }
+        /**
+         * Constant begin iterator function
+         */
+        [[nodiscard]] constexpr const T* cbegin() const {
+            return table;
+        }
+
+        /**
+         * End iterator function
+         */
+        [[nodiscard]] constexpr T* end() {
+            return table + enum_member_count<E>();
+        }
+        /**
+         * Constant end iterator function
+         */
+        [[nodiscard]] constexpr const T* cend() const {
+            return table + enum_member_count<E>();
+        }
+
         //aliases for STL compatibility; ignore these otherwise
         using value_type = T;
         using size_type = std::size_t;
@@ -217,6 +243,6 @@ namespace loam {
         using iterator = T*;
         using const_iterator = const T*;
     private:
-        std::array<T, enum_member_count<E>()> table = {};
+        T table[enum_member_count<E>()] = {};
     };
 }

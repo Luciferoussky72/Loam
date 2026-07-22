@@ -35,10 +35,8 @@ add_library(loam STATIC
 
         # Actual Loam stuff
         src/Gamepad.cpp
-        src/Loader.cpp
         src/Random.cpp
-        src/Sprites.cpp
-        src/Timing.cpp
+        src/Spritesheet.cpp
         src/KeyboardMouse.cpp
         src/Vec2.cpp
         src/Collisions.cpp
@@ -51,7 +49,7 @@ if (Python3_FOUND)
     add_custom_command(
             TARGET loam PRE_BUILD
             COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/compile_scripts/loam_hpp_generator.py
-            COMMENT "Auto-generating loam.hpp based on the headers in include/loam/"
+            COMMENT "Auto-generating loam.hpp based on the headers in /include/loam/"
     )
 else()
     message(WARNING "loam.hpp will not be auto-generated. If you've added new headers, run compile_scripts/loam_hpp_generator.py manually")

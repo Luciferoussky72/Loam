@@ -12,7 +12,6 @@ namespace loam {}
 #include <loam/Collisions.hpp>
 #include <loam/Concepts.hpp>
 #include <loam/Debug.hpp>
-#include <loam/Engine.hpp>
 #include <loam/Enums.hpp>
 #include <loam/Enumtable.hpp>
 #include <loam/Gamepad.hpp>
@@ -24,8 +23,7 @@ namespace loam {}
 #include <loam/Shapes.hpp>
 #include <loam/Sound.hpp>
 #include <loam/Spool.hpp>
-#include <loam/Sprites.hpp>
+#include <loam/Spritesheet.hpp>
 #include <loam/Strands.hpp>
 #include <loam/String.hpp>
-#include <loam/Timing.hpp>
 #include <loam/Vec2.hpp>
