@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <cstring>
+#include <SDL3/SDL_events.h>
 #include <SDL3/SDL_log.h>
 
 namespace loam {
@@ -10,7 +11,7 @@ namespace loam {
             if (SDL_Gamepad* gamepad = SDL_OpenGamepad(event.gdevice.which)) {
                 return Gamepad(gamepad);
             }
-            SDL_Log("Failed to open gamepad: %s", SDL_GetError());
+            SDL_Log("Failed to open gamepad. Error message: %s", SDL_GetError());
         }
         return std::nullopt;
     }
@@ -49,11 +50,13 @@ namespace loam {
         }
     }
 
-    void Gamepad::update() {
+    bool Gamepad::update() {
+        if (!gamepad_pointer) return false;
         for (size_t i = 0; i < SDL_GAMEPAD_BUTTON_COUNT; ++i) {
             previous_gamepad_buttons[i] = current_gamepad_buttons[i];
             current_gamepad_buttons[i] = SDL_GetGamepadButton(gamepad_pointer, static_cast<SDL_GamepadButton>(i));
         }
+        return true;
     }
 
     void Gamepad::process_event(const SDL_Event& event) {
@@ -63,27 +66,27 @@ namespace loam {
                 gamepad_pointer = nullptr;
                 return;
             }
-            SDL_Log("Failed to close gamepad: %s", SDL_GetError());
+            SDL_Log("Failed to close gamepad. Error message: %s", SDL_GetError());
         }
     }
 
-    bool Gamepad::is_gamepad_button_down(SDL_GamepadButton button) const {
+    bool Gamepad::button_down(SDL_GamepadButton button) const {
         return gamepad_pointer and current_gamepad_buttons[button];
     }
 
-    bool Gamepad::is_gamepad_button_pressed(SDL_GamepadButton button) const {
+    bool Gamepad::button_pressed(SDL_GamepadButton button) const {
         return gamepad_pointer and current_gamepad_buttons[button] and !previous_gamepad_buttons[button];
     }
 
-    bool Gamepad::is_gamepad_button_released(SDL_GamepadButton button) const {
+    bool Gamepad::button_released(SDL_GamepadButton button) const {
         return gamepad_pointer and !current_gamepad_buttons[button] and previous_gamepad_buttons[button];
     }
 
-    float Gamepad::get_gamepad_axis(SDL_GamepadAxis axis, float deadzone) const {
+    float Gamepad::get_axis(SDL_GamepadAxis axis, float deadzone) const {
         if (!gamepad_pointer) return 0.0f;
 
         Sint16 value = SDL_GetGamepadAxis(gamepad_pointer, axis);
-        float normalized = static_cast<float>(value) / 32767.0f;
+        float normalized = static_cast<float>(value) / static_cast<float>(SDL_JOYSTICK_AXIS_MAX);
 
         if (std::fabs(normalized) < deadzone) {
             return 0.0f;
