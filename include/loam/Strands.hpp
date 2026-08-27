@@ -30,18 +30,20 @@ namespace loam {
          * Constructs a Strands allocator
          * @param elements the number of elements that the allocator will be able to allocate
          */
-        [[nodiscard]] Strands(size_t elements) {
+        [[nodiscard]] explicit Strands(size_t elements) {
             memory = static_cast<ElementUnion*>(operator new(sizeof(ElementUnion) * elements, static_cast<std::align_val_t>(alignof(ElementUnion)), std::nothrow));
             if (!memory) {
-                SDL_Log("failed to allocate a Strands allocator's buffer!");
+                #ifndef NDEBUG
+                SDL_Log("Failed to allocate a Strands allocator's buffer!");
+                #endif
                 return;
             }
             num_elements = elements;
             for (size_t i = 0; i < num_elements - 1; ++i) {
-                memory[i].node = ElementNode{&memory[i + 1].node};
+                memory[i].node.next = &memory[i + 1].node;
             }
             //special case to make sure the last element's next pointer is nullptr
-            memory[num_elements - 1].node = ElementNode{nullptr};
+            memory[num_elements - 1].node.next = nullptr;
 
             head = &memory->node;
         }
@@ -108,6 +110,7 @@ namespace loam {
          * @return an initialized pointer to the allocator's memory, or nullptr if the allocator is out of memory
          */
         template <typename... Args>
+        requires std::invocable<typename T::T(), Args...>
         [[nodiscard]] T* construct_alloc(Args&& ...args) {
             T* tmp = alloc();
             if (!tmp) return nullptr;
@@ -132,24 +135,19 @@ namespace loam {
         /**
          * Frees the pointer fed to it and calls destructors
          * @note the pointer must from the allocator; feeding this function a pointer
-         * from elsewhere asserts in debug but is undefined behaviour in release
+         * from elsewhere is undefined behaviour
          * @warning *do not* feed the same pointer twice to this; you will
          * corrupt the allocator's bookkeeping and send your program to The Void of
          * No Return! (may not actually happen; but still, don't do it)
          * @param free_this the pointer to free
          */
         void free(T* free_this) {
+            if (!free_this) return;
             ElementUnion* tmp = reinterpret_cast<ElementUnion*>(free_this);
-            assert(free_this &&
-                reinterpret_cast<std::uintptr_t>(tmp) >= reinterpret_cast<std::uintptr_t>(memory) &&
-                reinterpret_cast<std::uintptr_t>(tmp) <  reinterpret_cast<std::uintptr_t>(memory + num_elements) &&
-                "Tried to free memory not from a Strands allocator!");
-            assert((reinterpret_cast<std::uintptr_t>(tmp) -  reinterpret_cast<std::uintptr_t>(memory)) % sizeof(ElementUnion) == 0 &&
-                "Tried to free a misaligned pointer in a Strands allocator");
             if constexpr (!std::is_trivially_destructible_v<T>) {
                 free_this->~T();
             }
-            tmp->node = ElementNode{head};
+            tmp->node.next = head;
             head = &tmp->node;
         }
 

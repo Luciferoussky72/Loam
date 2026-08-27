@@ -150,6 +150,6 @@ struct std::formatter<loam::Vec2> {
     }
 
     auto format(const loam::Vec2& vec2, std::format_context& context) const {
-        return std::format_to(context.out(), "{}{}, {}{}", loam::Vec2::VEC_FORMAT_LEFT, vec2.x, vec2.y, loam::Vec2::VEC_FORMAT_RIGHT);
+        return std::format_to(context.out(), "{}{:.4f}, {:.4f}{}", loam::Vec2::VEC_FORMAT_LEFT, vec2.x, vec2.y, loam::Vec2::VEC_FORMAT_RIGHT);
     }
 };

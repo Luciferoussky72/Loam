@@ -1,7 +1,7 @@
 #pragma once
 
 /**
- * Provides various math utilities that aren't already in the C++ STL
+ * Provides various math utilities that aren't already in the C++ Standard Library
  * @author luciferoussky72
  */
 #include <algorithm>
@@ -45,7 +45,7 @@ namespace loam {
         if (n == 0.0) return 0.0;
         float r = n;
         for (int i = 0; i < 20; i++)
-            r = 0.5 * (r + n / r);
+            r = 0.5f * (r + n / r);
         return r;
     }
 
@@ -69,7 +69,6 @@ namespace loam {
     template <typename T>
     requires std::is_arithmetic_v<T>
     float sqrt_lookup(T n) {
-        static_assert(std::is_arithmetic_v<T>, "Use an arithmetic value for loam::sqrt_lookup!");
         assert(n < SQRT_MAX && "Went above SQRT_MAX!");
         if constexpr (std::is_floating_point_v<T>) {
             if (n < 1) return std::sqrt(n);
@@ -208,9 +207,7 @@ namespace loam {
     template <typename T>
     requires std::is_arithmetic_v<T> and std::is_signed_v<T>
     constexpr T signof(T value) {
-        if (value == static_cast<T>(0)) return static_cast<T>(0);
-        if (value > static_cast<T>(0)) return static_cast<T>(1);
-        return static_cast<T>(-1);
+        return static_cast<T>(value > static_cast<T>(0)) - static_cast<T>(value < static_cast<T>(0));
     }
 
 

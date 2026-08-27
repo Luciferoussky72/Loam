@@ -29,7 +29,8 @@ namespace loam {
 
         /**
          * Loads a texture into the Loader from an existing SDL_Texture
-         * @warning the Loader becomes responsible for freeing the SDL_Texture you pass into it! Do not call SDL_DestroyTexture; use Loader::unload_texture instead
+         * @warning the Loader becomes responsible for freeing the SDL_Texture you pass into it! Do not call SDL_DestroyTexture;
+         * use Loader::unload_texture instead or let the Loader clean up the texture itself!
          * @param name the enumerator you would like to use to represent the texture
          * @note if there is already a texture in name's slot, this function will do nothing. Call Loader::unload_texture first
          * @param texture the texture you would like to store in that slot. This function does nothing if it is null
@@ -94,9 +95,19 @@ namespace loam {
          * @param name the enumerator bound to the texture
          * @return the texture if it exists, nullptr otherwise
          */
-        [[nodiscard]] SDL_Texture* fetch_texture(TE name) {
+        [[nodiscard]] SDL_Texture* fetch_texture(TE name) const {
             assert(verify_enum<TE>(name));
             return texture_storage[name];
+        }
+
+        /**
+         * Gets a texture from the Loader
+         * @param name the enumerator bound to the texture
+         * @note this *doesn't* return by reference, so don't try to modify a texture index via this; use the load and unload functions
+         * @return the texture if it exists, nullptr otherwise
+         */
+        [[nodiscard]] SDL_Texture* operator[](TE name) const {
+            return fetch_texture(name);
         }
 
         /**
@@ -105,7 +116,7 @@ namespace loam {
          * @param texture the texture to check for
          * @return true if it has it, false otherwise
          */
-        [[nodiscard]] bool has(SDL_Texture* texture) {
+        [[nodiscard]] bool has(SDL_Texture* texture) const {
             for (SDL_Texture* t : texture_storage) {
                 if (texture == t) return true;
             }
@@ -118,7 +129,7 @@ namespace loam {
          * @param spritesheet the Spritesheet to check for the texture
          * @return true if it has the Spritesheet's texture, false otherwise
          */
-        [[nodiscard]] bool has(const Spritesheet& spritesheet) {
+        [[nodiscard]] bool has(const Spritesheet& spritesheet) const {
             for (SDL_Texture* t : texture_storage) {
                 if (spritesheet.texture == t) return true;
             }

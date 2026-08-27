@@ -1,12 +1,12 @@
 #pragma once
 
-#include <SDL3/SDL.h>
+#include <SDL3/SDL_scancode.h>
 
 namespace loam {
     /**
      * Meant to give a cleaner way to refer to SDL mouse buttons
      */
-    enum class MouseButton {
+    enum class MouseButton : Uint8 {
         left_click = 1,
         middle_click,
         right_click,
@@ -26,7 +26,7 @@ namespace loam {
         KeyboardMouse();
 
         /**
-         * Simple destructor that flips keyboard_mouse_instance_exists_please_do_not_make_another back to false
+         * Simple destructor that flips keyboard_mouse_instance_exists_please_do_not_make_another_unless_you_want_to_summon_a_time_worm back to false
          */
         ~KeyboardMouse();
 
@@ -41,38 +41,38 @@ namespace loam {
          * @param key the SDL_Scancode for the key you want
          * @return true if the key is currently down
          */
-        [[nodiscard]] bool is_key_down(SDL_Scancode key) const;
+        [[nodiscard]] bool key_down(SDL_Scancode key) const;
         /**
          * Checks if a key has been pressed
          * @param key the SDL_Scancode for the key you want
          * @return true if the key has been pressed
          */
-        [[nodiscard]] bool is_key_pressed(SDL_Scancode key) const;
+        [[nodiscard]] bool key_pressed(SDL_Scancode key) const;
         /**
          * Checks if a key has been released
          * @param key the SDL_Scancode for the key you want
          * @return true if the key has been released
          */
-        [[nodiscard]] bool is_key_released(SDL_Scancode key) const;
+        [[nodiscard]] bool key_released(SDL_Scancode key) const;
 
         /**
          * Checks if a mouse button is down
          * @param button the mouse button to check for
          * @return true if the mouse button is down
          */
-        [[nodiscard]] bool is_mouse_button_down(MouseButton button) const;
+        [[nodiscard]] bool button_down(MouseButton button) const;
         /**
          * Checks if a mouse button is pressed
          * @param button the mouse button to check for
          * @return true if the mouse button is down
          */
-        [[nodiscard]] bool is_mouse_button_pressed(MouseButton button) const;
+        [[nodiscard]] bool button_pressed(MouseButton button) const;
         /**
          * Checks if a mouse button is released
          * @param button the mouse button to check for
          * @return true if the mouse button is down
          */
-        [[nodiscard]] bool is_mouse_button_released(MouseButton button) const;
+        [[nodiscard]] bool button_released(MouseButton button) const;
         /**
          * Gets the mouse's x coordinate
          * @return the mouse x coordinate
@@ -88,7 +88,7 @@ namespace loam {
             return mouse_y;
         }
     private:
-        static bool keyboard_mouse_instance_exists_please_do_not_make_another_unless_you_want_to_summon_a_time_worm;
+        inline static bool keyboard_mouse_instance_exists_please_do_not_make_another_unless_you_want_to_summon_a_time_worm = false;
 
         float mouse_x = 0.0f;
         float mouse_y = 0.0f;

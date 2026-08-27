@@ -28,12 +28,12 @@ Let me ask; does it actually matter? I get that there are some arguments that a 
 really the debate just boils down the personal preference.
 
 The one place it actually does matter is when you have a production library or codebase where consistency is more valuable.
-Thankfully, that's the kind of problem you can solve in five minutes with a text-replace tool.
+Thankfully, that's the kind of problem you can solve in five minutes with a formatting tool.
 
-In fact, I would call arguing about petty style guidelines unproductive bikeshedding. Anyone can argue about how to format braces, but it takes actual 
+In fact, I would say arguing about petty style guidelines is unproductive bikeshedding. Anyone can argue about how to format braces, but it takes 
 time and thought to figure out conventions that are actually useful.
 
-Instead of petty style guidelines, Loam's guidelines are focused on "semantic" guidelines. Guidelines that actually help people write code that is clear and 
+Instead of petty style guidelines, Loam's guidelines are focused on "semantic" guidelines. Guidelines that actually help people write clear and 
 correct code. 
 
 If you are interested in working on Loam or just want to learn more about C++ style, you should give this file a read. It is full of ideas borrowed from other 
@@ -83,7 +83,7 @@ is much cleaner and clearer than:
 int x = 50, y = 100;
 ```
 
-The one exception is structured bindings:
+The one exception (sort of) is structured bindings:
 ```c++
 //Used in Loam
 auto& [a, b, c] = foo;
@@ -312,7 +312,7 @@ there won't be more pauses from heap allocations!
 ### 5. Error handling
 
 The first and foremost rule of error handling in Loam is to ***never use exceptions***; in fact, Loam is compiled with -fno-exceptions, 
-so you *have* to use other methods of handling errors.
+so you *have* to use other error handling methods.
 
 Now, you may ask, "why?" (The great part about writing documentation is that I can put words in your mouth and you can't stop me, muahaha!)
 
@@ -365,7 +365,7 @@ For this reason, I find it way harder to actually properly deal with errors when
 ##### 3. In theory, they're a zero-cost abstraction, but they're not in practice
 
 The big assumption I see around exceptions is that it's a zero-cost abstraction if you don't ever throw. While this seems reasonable, 
-and it is technically true that *at runtime*, exceptions can actually make your code slower by a significant margin compared to other 
+and it is technically true *at runtime*. Thing is, exceptions can actually make your code slower by a significant margin compared to other 
 methods of error handling.
 
 One of the reasons for this is that there's this part of the compiler called the "optimizer," and an optimizer is a serious thing. For 
@@ -379,7 +379,7 @@ return SQRT_TABLE[below] + percent * (SQRT_TABLE[above] - SQRT_TABLE[below]);
 ```
 
 The optimizer is smart enough to see that we're creating below, above, and percent and just using them to immediately compute the return 
-value. Because of that, the optimizer is able to just store the variables in CPU caches or even roll it all into one expression, which 
+value. Because of that, the optimizer is able to just store the variables in CPU registers or even roll it all into one expression, which 
 ends up being faster. It's actually one of the pros of writing code in a compiled language like C++; you can write clear code that's 
 easy to scan through and understand and the optimizer optimizes it down to the spaghetti instructions you would have written in a 
 scripting language like Python or Lua:
@@ -411,7 +411,7 @@ A simple SDL_Log message often works for trivial things that aren't grounds for 
 
 As for why Loam mostly uses SDL_Log instead of something like std::clog or something is that SDL_Log is platform-aware. If the user is on 
 a platform without a proper output terminal, the output from std::clog is not likely to go anywhere useful. Meanwhile, SDL_Log logs to 
-the appropriate logs for the system, such as the log files on iOS.
+the appropriate logs for the system, such as log files on iOS.
 
 ##### 2. Boolean return values
 
@@ -578,6 +578,13 @@ assignment operator to not do any actual assignment.
 
 The one exception (technically) is that you're allowed to overload the send-to-stream and get-from-stream operators. Technically, those operators mean 
 "bit shift", but the C++ STL already uses them all over the place for streams, so it'd be kind of silly to ban them.
+
+Now, there is one other thing to say about operator overloading. I shouldn't have to say it, but I want to make sure the point is clear:
+
+## DO NOT OVERLOAD THE ADDRESS-OF (operator&) OR COMMA (operator,) OPERATORS! ##
+
+Overloading those operators makes code harder to read, and if you really need to do something involving getting a pointer to an object or ordering, make it a member 
+function instead!
 
 ## This file is likely to change as Loam and my own personal coding style evolve. For now though, this covers 95% of the coding conventions that come up on a day-to-day basis in Loam
 

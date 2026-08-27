@@ -7,11 +7,9 @@
  * with the concept, and editor tooling has been slow to adopt it- at the time of writing, Clang is still mostly reflection-blind
  */
 
-#include <iomanip>
 #include <type_traits>
 #include <iostream>
 #include <meta>
-#include <expected>
 
 #include "imgui.h"
 
@@ -94,38 +92,6 @@ namespace loam {
         for (; start <= stop; start += step) {
             std::println(stream, "Input: {} Result: {}", start, function(start));
         }
-    }
-
-    /**
-     * Pushes debug UI for a class instance to a new ImGui window
-     * @tparam T the type to log
-     * @param instance the instance of T to log
-     * @param window_lifetime a pointer to the bool that controls when the window closes
-     * @param window_flags the flags the window should use
-     * @return true on success, false on failure
-     */
-    template <typename T>
-    requires std::is_class_v<T>
-    bool generate_class_debug_ui(const T& instance, bool* window_lifetime, ImGuiWindowFlags window_flags) {
-        ImGui::Begin(std::meta::identifier_of(^^T).data(), window_lifetime, window_flags);
-
-        static constexpr auto members = std::define_static_array(
-            std::meta::nonstatic_data_members_of(^^T, std::meta::access_context::unchecked())
-        );
-
-        template for (constexpr auto m : members) {
-            using member_type = [:std::meta::type_of(m):]
-
-            if constexpr (std::is_convertible_v<member_type, std::string>) {
-                ImGui::Text(std::format("{}: \"{}\"", std::meta::identifier_of(m), instance.[:m:]).c_str());
-            } else {
-                ImGui::Text(std::format("{}: {}", std::meta::identifier_of(m), instance.[:m:]).c_str());
-            }
-        }
-
-        ImGui::End();
-
-        return true;
     }
 }
 

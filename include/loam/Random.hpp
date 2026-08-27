@@ -72,7 +72,7 @@ namespace loam {
      * @param probability the chance of returning true
      * @return true or false
      */
-    bool rand_bool(double probability);
+    bool rand_bool(double probability = 0.5);
 
     /**
      * Picks a random element out of a container using iterators

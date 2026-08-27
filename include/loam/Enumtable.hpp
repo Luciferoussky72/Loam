@@ -34,7 +34,7 @@ namespace loam {
          * Uniformly initializes the table
          * @param uniform the value to uniformly initialize the table with
          */
-        constexpr Enumtable(T uniform) {
+        constexpr Enumtable(const T& uniform) {
             verify_enum();
             for (T& t : table) {
                 t = uniform;
@@ -106,7 +106,7 @@ namespace loam {
          */
         consteval void verify_enum() const {
             size_t n = 0;
-            for (constexpr std::meta::info e : std::define_static_array(std::meta::enumerators_of(^^E))) {
+            template for (constexpr auto e : std::define_static_array(std::meta::enumerators_of(^^E))) {
                 if (n != static_cast<size_t>([:e:])) {
                     error_enum_type_incompatible_with_loam_enumtable();
                 }

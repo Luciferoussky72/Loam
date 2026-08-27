@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.1)
+cmake_minimum_required(VERSION 3.28)
 set(CMAKE_CXX_COMPILER g++-16)
 project(Loam VERSION 0.1.0)
 
@@ -79,4 +79,7 @@ target_include_directories(loam PUBLIC "libraries/imgui/")
 target_include_directories(loam PUBLIC "libraries/imgui/backends/")
 target_include_directories(loam PUBLIC "libraries/tomlplusplus/")
 
-target_link_libraries(loam PUBLIC SDL3::SDL3 SDL3_mixer::SDL3_mixer)
+target_link_libraries(loam PUBLIC
+        SDL3::SDL3
+        SDL3_mixer::SDL3_mixer
+)
